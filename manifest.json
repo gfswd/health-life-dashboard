@@ -1,0 +1,19 @@
+{
+  "name": "Health & Life Dashboard",
+  "short_name": "Health & Life",
+  "description": "Offline-First Fitness-, Blutdruck-, Fokus- & Ernährungstracker ohne Cloud.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1120",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

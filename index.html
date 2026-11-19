@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Health & Life">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>Health & Life Dashboard</title>
+<style>
+:root{
+  --bg:#0b1120;--hdr:#0f172a;--card:#151f32;--alt:#1b273e;--inp:#0d1525;
+  --bdr:#26354f;--bdr2:#334668;--txt:#f1f5f9;--mut:#94a3b8;
+  --blue:#38bdf8;--blueBg:rgba(56,189,248,.14);
+  --grn:#10b981;--grnBg:rgba(16,185,129,.18);
+  --amb:#f59e0b;--ambBg:rgba(245,158,11,.18);
+  --red:#f43f5e;--redBg:rgba(244,63,94,.16);
+  --vio:#a78bfa;--vioBg:rgba(167,139,250,.16);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--txt);font:14px/1.45 var(--sans);display:flex;flex-direction:column}
+header{flex:0 0 auto;background:var(--hdr);border-bottom:1px solid var(--bdr);padding-top:env(safe-area-inset-top,0px);z-index:20}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 6px}
+.hdr-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin:0}
+.logo{width:24px;height:24px;border-radius:6px;background:var(--blueBg);border:1px solid rgba(56,189,248,.35);display:flex;align-items:center;justify-content:center;color:var(--blue)}
+.pills{display:flex;gap:6px}
+.pill{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--alt);color:var(--mut);border:1px solid var(--bdr);white-space:nowrap}
+.pill.on{background:var(--grnBg);color:#34d399;border-color:rgba(16,185,129,.45)}
+nav.tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:4px 4px 6px}
+.tab{appearance:none;border:1px solid transparent;background:transparent;color:var(--mut);border-radius:8px;padding:5px 1px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-width:0}
+.tab svg{width:15px;height:15px;stroke-width:2.1}
+.tab span{font-size:9.5px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;max-width:100%}
+@media(min-width:400px){.tab span{font-size:10.5px}.tab svg{width:16px;height:16px}}
+.tab.active{background:var(--blueBg);color:var(--blue);border-color:rgba(56,189,248,.35)}
+main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:12px 12px calc(24px + env(safe-area-inset-bottom,0px));max-width:680px;width:100%;margin:0 auto}
+.panel{display:none;flex-direction:column;gap:12px}
+.panel.active{display:flex}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:14px;box-shadow:0 4px 16px rgba(0,0,0,.28)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.card-hdr h2,.card-hdr h3{font-size:15px;font-weight:700;margin:0}
+.sub{font-size:12px;color:var(--mut);margin:2px 0 0}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:3px;gap:4px}
+.seg.c4{grid-template-columns:repeat(4,1fr)}
+.seg button{appearance:none;border:none;background:transparent;color:var(--mut);font:600 12.5px var(--sans);padding:8px 6px;border-radius:9px;cursor:pointer}
+.seg button.active{background:var(--blue);color:#082f49;font-weight:700}
+.btn{appearance:none;border:1px solid var(--bdr2);background:var(--alt);color:var(--txt);font:600 13px var(--sans);padding:10px 14px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(.98)}
+.btn-blue{background:var(--blue);border-color:var(--blue);color:#082f49;font-weight:700}
+.btn-grn{background:var(--grn);border-color:var(--grn);color:#022c22;font-weight:700}
+.btn-red{background:var(--redBg);border-color:rgba(244,63,94,.45);color:#fda4af}
+.btn-sm{padding:5px 9px;font-size:11.5px;border-radius:8px}
+.full{width:100%}
+label.lbl{display:block;font-size:11.5px;font-weight:600;color:var(--mut);margin-bottom:4px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:var(--inp);border:1px solid var(--bdr);color:var(--txt);font:14px var(--sans);padding:9px 10px;border-radius:8px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+textarea{resize:vertical;min-height:68px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chk-row{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;cursor:pointer;user-select:none}
+.chk-row.on{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.08)}
+.chk-row input{width:19px;height:19px;margin:1px 0 0;accent-color:var(--grn);flex-shrink:0}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.b-grn{background:var(--grnBg);color:#34d399}.b-amb{background:var(--ambBg);color:#fbbf24}.b-red{background:var(--redBg);color:#fb7185}.b-blue{background:var(--blueBg);color:#7dd3fc}
+
+/* Status-Banner & Hinweise */
+.status-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:10px}
+.st-chip{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--inp);border:1px solid var(--bdr);border-radius:10px;padding:7px 9px;cursor:pointer;text-align:left}
+.st-chip:active{transform:scale(.99)}
+.st-chip.ok{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.08)}
+.st-chip.part{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.08)}
+.alert-box{padding:10px 12px;border-radius:12px;font-size:12px;line-height:1.4;border:1px solid var(--bdr);background:var(--inp);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.alert-box.warn{border-color:rgba(245,158,11,.45);background:var(--ambBg);color:#fde68a}
+.alert-box.ok{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.1);color:#a7f3d0}
+
+/* Timer & Übungen */
+.stage{text-align:center;padding:14px 12px;border-radius:16px;background:linear-gradient(180deg,#172338 0%,#101828 100%);border:1px solid var(--bdr2)}
+.stage.prep{border-color:var(--amb)}.stage.work{border-color:var(--grn)}.stage.rest{border-color:var(--blue)}.stage.done{border-color:var(--vio)}
+.phase{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:6px;background:var(--alt);color:var(--mut)}
+.prep .phase{background:var(--ambBg);color:#fbbf24}.work .phase{background:var(--grnBg);color:#34d399}.rest .phase{background:var(--blueBg);color:#38bdf8}.done .phase{background:var(--vioBg);color:#c4b5fd}
+.digits{font:800 50px/1.05 var(--mono);letter-spacing:-.03em;margin:4px 0}
+.bar{width:100%;height:7px;background:var(--inp);border-radius:999px;overflow:hidden;margin:10px 0 12px}
+.bar-fill{height:100%;width:0%;background:var(--grn);transition:width .2s linear}
+.vis-box{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:10px;margin-top:10px;text-align:left}
+.svg-box{width:100%;max-width:230px;height:110px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+.svg-box svg{width:100%;height:100%}
+.cue{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blueBg);padding:6px 9px;border-radius:8px;margin-bottom:6px}
+.item{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:10px;margin-bottom:8px}
+.item.cur{border-color:var(--grn);background:rgba(16,185,129,.07)}
+.item.nxt{border-color:var(--blue);background:rgba(56,189,248,.07)}
+.item.dim{opacity:.55}
+.item-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer}
+.drawer{margin-top:10px;padding-top:10px;border-top:1px dashed var(--bdr2);display:none}
+.drawer.open{display:block}
+.t-inps{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--bdr)}
+
+/* Charts & Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.stat{background:var(--inp);border:1px solid var(--bdr);border-radius:8px;padding:7px 6px;text-align:center}
+.stat-v{font:700 13.5px var(--mono)}
+.stat-l{font-size:10.5px;color:var(--mut)}
+.chart{width:100%;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:8px}
+
+/* 7-Tage Fokus */
+.d7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.d7-c{background:var(--inp);border:1px solid var(--bdr);border-radius:8px;padding:6px 2px;text-align:center;cursor:pointer}
+.d7-c.sel{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.dots{display:flex;justify-content:center;gap:2px;margin-top:3px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--bdr2)}
+.dot.on{background:var(--grn)}
+
+/* Box Breathing */
+.breath-wrap{display:flex;flex-direction:column;align-items:center;padding:16px 10px}
+.ring{width:164px;height:164px;border-radius:50%;border:2px dashed var(--bdr2);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.circle{width:94px;height:94px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.45),rgba(16,185,129,.25));border:2px solid var(--blue);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .15s linear}
+
+/* Kalender, Essen & Rezepte */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px}
+.cal-wd,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-wd{text-align:center;font-size:11px;font-weight:700;color:var(--mut);margin-bottom:4px}
+.cell{aspect-ratio:1/1;border-radius:8px;background:var(--inp);border:1.5px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:var(--txt);cursor:pointer;position:relative;padding:0}
+.cell.empty{background:transparent;border-color:transparent;cursor:default}
+.cell.grn{background:rgba(16,185,129,.24);border-color:rgba(16,185,129,.55);color:#a7f3d0}
+.cell.amb{background:rgba(245,158,11,.22);border-color:rgba(245,158,11,.55);color:#fde68a}
+.cell.sel{box-shadow:0 0 0 2px #fff,0 0 10px rgba(56,189,248,.65);z-index:2}
+.cell.tod::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--blue);position:absolute;bottom:3px}
+.meal-box{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:9px 10px}
+.meal-top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.meal-tools{display:flex;align-items:center;gap:5px;flex:1;justify-content:flex-end;min-width:190px}
+.prep-sel{background:var(--ambBg);border:1px solid rgba(245,158,11,.45);color:#fcd34d;font:700 11px var(--sans);padding:4px 6px;border-radius:7px;max-width:185px;width:auto;cursor:pointer}
+.prep-sel option{background:var(--hdr);color:var(--txt);font-weight:600}
+.meal-inp-row{display:flex;align-items:center;gap:6px}
+.meal-inp-row input{flex:1;min-width:0}
+.del-meal{appearance:none;background:var(--redBg);border:1px solid rgba(244,63,94,.4);color:#fda4af;font:700 13px var(--sans);width:34px;height:36px;border-radius:8px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.del-meal:active{transform:scale(.95)}
+.rec-sec{margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:8px}
+.rec-sec-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
+details.rec{background:var(--inp);border:1px solid var(--bdr2);border-radius:12px;padding:10px 12px}
+details.rec[open]{border-color:rgba(245,158,11,.45)}
+details.rec summary{font-size:12.5px;font-weight:700;color:#fcd34d;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+details.rec summary::-webkit-details-marker{display:none}
+.rec-meta{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.rec-body{margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr);font-size:12.5px}
+.rec-body ul,.rec-body ol{margin:5px 0 10px 18px;padding:0}
+.rec-body li{margin-bottom:3px}
+
+/* Tabellen & Toast */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--mut);font-weight:600;padding:6px 4px;border-bottom:1px solid var(--bdr)}
+td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
+.pos{color:#fbbf24;font-weight:600}.neg{color:#34d399;font-weight:600}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#f8fafc;border:1px solid var(--blue);padding:9px 16px;border-radius:999px;font-size:12.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.45);z-index:99;opacity:0;pointer-events:none;transition:all .2s ease;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* Modals (Disclaimer & Über die App) */
+.modal-backdrop{position:fixed;inset:0;background:rgba(6,10,20,.86);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:200}
+.modal-backdrop.open{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--bdr2);border-radius:18px;max-width:460px;width:100%;max-height:86dvh;overflow-y:auto;padding:18px;box-shadow:0 16px 40px rgba(0,0,0,.6)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bdr)}
+.modal-hdr h2{font-size:16px;font-weight:800;margin:0}
+.modal-body{font-size:13px;line-height:1.5;color:var(--txt);display:flex;flex-direction:column;gap:10px}
+.modal-body p{margin:0}
+.info-btn{appearance:none;background:var(--blueBg);border:1px solid rgba(56,189,248,.4);color:var(--blue);font:700 11px var(--sans);padding:3px 9px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.info-btn:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <h1 class="hdr-title">
+      <span class="logo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+      Health & Life
+    </h1>
+    <div class="pills">
+      <button type="button" id="aboutBtn" class="info-btn" title="Über diese App">ℹ️ Über</button>
+      <span id="wakePill" class="pill">Display: Auto</span>
+      <span id="datePill" class="pill">--.--.----</span>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button type="button" class="tab active" data-t="p-daily"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/></svg><span>Täglich</span></button>
+    <button type="button" class="tab" data-t="p-train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6.5 6.5 11 11"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg><span>Training</span></button>
+    <button type="button" class="tab" data-t="p-bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>Blutdruck</span></button>
+    <button type="button" class="tab" data-t="p-focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>Fokus</span></button>
+    <button type="button" class="tab" data-t="p-rest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><span>Ruhe</span></button>
+    <button type="button" class="tab" data-t="p-body"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg><span>Körper</span></button>
+    <button type="button" class="tab" data-t="p-bak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg><span>Backup</span></button>
+  </nav>
+</header>
+
+<main id="mainBox">
+
+  <!-- TAB 1: TÄGLICH -->
+  <section id="p-daily" class="panel active">
+    <div class="status-strip" aria-label="Tages-Status-Indikator">
+      <button type="button" class="st-chip" id="stFoodChip">
+        <div>
+          <div style="font-size:10.5px;color:var(--mut);font-weight:600">🍽️ Frühstück heute</div>
+          <div id="stFoodTxt" style="font-size:12px;font-weight:700;margin-top:1px">Offen</div>
+        </div>
+        <span id="stFoodBadge" class="badge b-amb">Offen</span>
+      </button>
+      <button type="button" class="st-chip" id="stFocChip">
+        <div>
+          <div style="font-size:10.5px;color:var(--mut);font-weight:600">🎯 Fokus-Haken</div>
+          <div id="stFocTxt" style="font-size:12px;font-weight:700;margin-top:1px">0 / 3 erledigt</div>
+        </div>
+        <span id="stFocBadge" class="badge b-amb">0/3</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div><h2>7-Minuten-Aktivierung</h2><p class="sub" id="dailyStat">Heute: Noch offen</p></div>
+        <button type="button" class="btn btn-sm" id="sndBtn">🔊 Ton an</button>
+      </div>
+      <div class="seg" style="margin-bottom:12px">
+        <button type="button" class="active" id="mKb" data-wm="kettlebell">Kettlebell (10 kg)</button>
+        <button type="button" id="mBw" data-wm="bodyweight">Bodyweight</button>
+      </div>
+      <div id="tStage" class="stage">
+        <span id="tPhase" class="phase">BEREIT · 7 ÜBUNGEN</span>
+        <div id="tDigits" class="digits">00:45</div>
+        <div id="tExTitle" style="font-size:15px;font-weight:700">1. Kettlebell Halos (10 kg)</div>
+        <div class="bar"><div id="tFill" class="bar-fill"></div></div>
+        <div class="g2" style="margin-bottom:10px">
+          <button type="button" class="btn btn-grn" id="tStart">▶ Starten</button>
+          <button type="button" class="btn" id="tReset">↺ Zurücksetzen</button>
+        </div>
+        <div class="vis-box">
+          <div id="tSvg" class="svg-box"></div>
+          <div id="tCue" class="cue"></div>
+          <p id="tGuide" class="sub"></p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><h3>Übungsübersicht & Vorschau</h3><span class="badge b-blue">45s / 15s</span></div>
+      <p class="sub" style="margin-bottom:10px">Tippe auf eine Übung für Anleitung & Grafik (laufender Timer läuft weiter).</p>
+      <div id="exList"></div>
+    </div>
+  </section>
+
+  <!-- TAB 2: TRAINING -->
+  <section id="p-train" class="panel">
+    <div class="card">
+      <div class="card-hdr"><div><h2>Kraft- & Ausdauer-Logbuch</h2><p class="sub">Gelenkschonende Ausführung · Merkt sich deine Werte</p></div></div>
+      <div class="seg" style="margin-bottom:12px">
+        <button type="button" class="active" id="plMx" data-tp="studio">Fitnessstudio</button>
+        <button type="button" id="plHm" data-tp="home">Heim-Gym</button>
+      </div>
+      <div style="margin-bottom:12px"><label class="lbl" for="trDate">Trainingsdatum</label><input type="date" id="trDate"></div>
+      <div id="trCards"></div>
+      <div style="margin:8px 0 12px"><label class="lbl" for="trNote">Trainingsnotiz (optional)</label><input type="text" id="trNote" placeholder="z. B. Gutes Gefühl, saubere Ausführung..."></div>
+      <button type="button" class="btn btn-blue full" id="trSave">✓ Einheit speichern & Gewichte merken</button>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><h3>Letzte Einheiten</h3><span id="trCnt" class="badge b-blue">0</span></div>
+      <div id="trHist"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: BLUTDRUCK -->
+  <section id="p-bp" class="panel">
+    <div class="card">
+      <div class="card-hdr"><div><h2>Blutdruck & Puls</h2><p class="sub">5 Min. ruhig sitzen vor der Messung</p></div></div>
+      <div class="g2" style="margin-bottom:10px">
+        <div><label class="lbl" for="bpDate">Datum</label><input type="date" id="bpDate"></div>
+        <div><label class="lbl">Tageszeit</label><div class="seg"><button type="button" id="bpMorn" data-bt="morning">☀ Morgen</button><button type="button" id="bpEve" data-bt="evening">☾ Abend</button></div></div>
+      </div>
+      <div class="g3" style="margin-bottom:12px">
+        <div><label class="lbl" for="bpSys">Systole</label><input type="number" id="bpSys" inputmode="numeric" placeholder="122"></div>
+        <div><label class="lbl" for="bpDia">Diastole</label><input type="number" id="bpDia" inputmode="numeric" placeholder="78"></div>
+        <div><label class="lbl" for="bpPul">Puls</label><input type="number" id="bpPul" inputmode="numeric" placeholder="64"></div>
+      </div>
+      <button type="button" class="btn btn-blue full" id="bpSave">+ Messung speichern</button>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><h3>Verlauf (letzte 14 Messungen)</h3><span id="bpBadge" class="badge b-grn">Normal</span></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-v" id="bpAvg">--/--</div><div class="stat-l">Ø Sys / Dia</div></div>
+        <div class="stat"><div class="stat-v" id="bpAvgP">--</div><div class="stat-l">Ø Puls</div></div>
+        <div class="stat"><div class="stat-v" id="bpMM">-- / --</div><div class="stat-l">Sys Min/Max</div></div>
+      </div>
+      <div class="chart" id="bpChart"></div>
+    </div>
+    <div class="card"><div class="card-hdr"><h3>Messprotokoll</h3></div><div id="bpHist"></div></div>
+  </section>
+
+  <!-- TAB 4: FOKUS -->
+  <section id="p-focus" class="panel">
+    <div class="card">
+      <div class="card-hdr">
+        <div><h2>Kognition & Alltagsschutz</h2><p class="sub" id="focLbl">Heute</p></div>
+        <button type="button" class="btn btn-sm" id="focToday" style="display:none">Zurück zu Heute</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+        <label class="chk-row" id="fRow1"><input type="checkbox" id="fChk1"><span>Mindestens 10 Seiten Buch lesen</span></label>
+        <label class="chk-row" id="fRow2"><input type="checkbox" id="fChk2"><span>Mindestens 1 echter sozialer Kontakt (aktiv gemeldet/getroffen)</span></label>
+        <label class="chk-row" id="fRow3"><input type="checkbox" id="fChk3"><span>Aktives To-Do jenseits digitalem Konsum (z. B. Musikinstrument, Handwerk, Sport, Familie)</span></label>
+      </div>
+      <div>
+        <div class="meal-top"><label class="lbl" for="fNote">Tagesnotiz / Gedanke</label><span id="fSav" style="font-size:11px;color:#34d399">Speichert automatisch</span></div>
+        <textarea id="fNote" placeholder="Was habe ich gelesen, gebaut, gespielt oder besprochen?"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><h3>7-Tage-Rückblick</h3><span class="sub">Antippen zum Bearbeiten</span></div>
+      <div class="d7" id="fGrid"></div>
+    </div>
+  </section>
+
+  <!-- TAB 5: RUHE -->
+  <section id="p-rest" class="panel">
+    <div class="card">
+      <div class="card-hdr">
+        <div><h2>Box Breathing (4-4-4-4)</h2><p class="sub" id="brRounds">Abgeschlossene Runden: 0</p></div>
+        <button type="button" class="btn btn-sm" id="brSnd">🔊 Ton an</button>
+      </div>
+      <div class="breath-wrap">
+        <div class="ring"><div class="circle" id="brCirc"><span id="brPh" style="font-size:12px;font-weight:700">Bereit</span><span id="brSec" style="font:800 20px var(--mono)">4s</span></div></div>
+        <div class="g2" style="width:100%;max-width:270px">
+          <button type="button" class="btn btn-blue" id="brStart">▶ Start</button>
+          <button type="button" class="btn" id="brStop">■ Stopp</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div><h3>Abendlicher Mind-Dump</h3><p class="sub">Entwurf wird beim Tippen live gesichert</p></div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+        <div><label class="lbl" for="dq1">1. Was hat mich heute belastet?</label><textarea id="dq1" rows="2"></textarea></div>
+        <div><label class="lbl" for="dq2">2. Was lasse ich für heute bewusst los?</label><textarea id="dq2" rows="2"></textarea></div>
+        <div><label class="lbl" for="dq3">3. Was war heute gut?</label><textarea id="dq3" rows="2"></textarea></div>
+      </div>
+      <button type="button" class="btn btn-grn full" id="dSave">✓ Mind-Dump abschließen & archivieren</button>
+      <div id="dHist" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- TAB 6: KÖRPER & ERNÄHRUNG -->
+  <section id="p-body" class="panel">
+    <div class="seg">
+      <button type="button" class="active" id="subFoodBtn" data-bs="food">🍽️ Essen & Kalender</button>
+      <button type="button" id="subMetBtn" data-bs="metrics">⚖️ Körper & Messwerte</button>
+    </div>
+
+    <div id="subFood" style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="cal-nav">
+          <button type="button" class="btn btn-sm" id="calPrev">← Vorheriger</button>
+          <div style="font-size:14.5px;font-weight:700" id="calTitle">November 2026</div>
+          <button type="button" class="btn btn-sm" id="calNext">Nächster →</button>
+        </div>
+        <div class="g2" style="margin-bottom:10px">
+          <button type="button" class="btn btn-sm" id="calToday">Heute</button>
+          <button type="button" class="btn btn-sm btn-blue" id="calTmrw">Morgen vorplanen (+1 Tag)</button>
+        </div>
+        <div class="cal-wd"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:10px;padding-top:8px;border-top:1px solid var(--bdr)">
+          <span>🟢 Beide Fokus-Haken</span><span>🟡 Geplant / 1 Haken</span><span>⬛ Offen</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div><h3 id="foodHead">Heute</h3><p class="sub">Tages-Planer & Bewusstseins-Checkliste</p></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span id="foodSav" class="badge b-grn">Speichert automatisch</span>
+            <button type="button" class="btn btn-sm btn-red" id="clearDayMeals" title="Alle Mahlzeiten dieses Tages leeren">🗑️ Tag leeren</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+          <label class="chk-row" id="fdRow1"><input type="checkbox" id="fdRep"><span>✓ 1 Hauptmahlzeit bewusst durch Meal-Prep / Shake ersetzt</span></label>
+          <label class="chk-row" id="fdRow2"><input type="checkbox" id="fdSnk"><span>✓ Kein unbewusstes Nebenbei-Essen & ausreichend Wasser getrunken</span></label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="meal-box">
+            <div class="meal-top">
+              <label class="lbl" for="fdB" style="margin:0">Frühstück</label>
+              <div class="meal-tools">
+                <select class="prep-sel" data-prep-meal="breakfast" aria-label="Meal-Prep oder Shake für Frühstück wählen"></select>
+              </div>
+            </div>
+            <div class="meal-inp-row">
+              <input type="text" id="fdB" placeholder="Geplant oder gegessen (frei editierbar)...">
+              <button type="button" class="del-meal" data-del-meal="breakfast" title="Frühstück löschen">✕</button>
+            </div>
+          </div>
+
+          <div class="meal-box">
+            <div class="meal-top">
+              <label class="lbl" for="fdL" style="margin:0">Mittagessen</label>
+              <div class="meal-tools">
+                <select class="prep-sel" data-prep-meal="lunch" aria-label="Meal-Prep oder Shake für Mittagessen wählen"></select>
+              </div>
+            </div>
+            <div class="meal-inp-row">
+              <input type="text" id="fdL" placeholder="Geplant oder gegessen (frei editierbar)...">
+              <button type="button" class="del-meal" data-del-meal="lunch" title="Mittagessen löschen">✕</button>
+            </div>
+          </div>
+
+          <div class="meal-box">
+            <div class="meal-top">
+              <label class="lbl" for="fdD" style="margin:0">Abendessen</label>
+              <div class="meal-tools">
+                <select class="prep-sel" data-prep-meal="dinner" aria-label="Meal-Prep oder Shake für Abendessen wählen"></select>
+              </div>
+            </div>
+            <div class="meal-inp-row">
+              <input type="text" id="fdD" placeholder="Geplant oder gegessen (frei editierbar)...">
+              <button type="button" class="del-meal" data-del-meal="dinner" title="Abendessen löschen">✕</button>
+            </div>
+          </div>
+
+          <div class="meal-box">
+            <div class="meal-top">
+              <label class="lbl" for="fdS" style="margin:0">Snacks / Getränke / Notiz</label>
+            </div>
+            <div class="meal-inp-row">
+              <input type="text" id="fdS" placeholder="z. B. 2,5 L Wasser, Kaffee schwarz...">
+              <button type="button" class="del-meal" data-del-meal="snacks" title="Snacks / Notiz löschen">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-sec">
+          <div class="rec-sec-hdr">
+            <div>
+              <strong style="font-size:13.5px">🥣 Meal-Prep & Shake-Alternativen</strong>
+              <p class="sub">Am Vorabend oder in 1 Min. machbar · ~380–450 kcal</p>
+            </div>
+            <span class="badge b-amb">5 Optionen</span>
+          </div>
+          <div id="recipeList" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="subMet" style="display:none;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="card-hdr"><div><h3>Körperwerte erfassen</h3><p class="sub">Morgens nüchtern unter gleichen Bedingungen</p></div></div>
+        <div style="margin-bottom:8px"><label class="lbl" for="bdDate">Datum</label><input type="date" id="bdDate"></div>
+        <div class="g2" style="margin-bottom:8px">
+          <div><label class="lbl" for="bdW">Gesamtgewicht (kg)</label><input type="number" step="0.1" id="bdW" inputmode="decimal" placeholder="88.5"></div>
+          <div><label class="lbl" for="bdM">Skelettmuskelmasse (kg)</label><input type="number" step="0.1" id="bdM" inputmode="decimal" placeholder="36.2"></div>
+        </div>
+        <div class="g2" style="margin-bottom:8px">
+          <div><label class="lbl" for="bdWa">Körperwasser (kg)</label><input type="number" step="0.1" id="bdWa" inputmode="decimal" placeholder="45.0"></div>
+          <div><label class="lbl" for="bdF">Fettmasse (kg)</label><input type="number" step="0.1" id="bdF" inputmode="decimal" placeholder="21.4"></div>
+        </div>
+        <div style="margin-bottom:12px"><label class="lbl" for="bdN">Notizen</label><input type="text" id="bdN" placeholder="z. B. Nach Ruhetag..."></div>
+        <button type="button" class="btn btn-blue full" id="bdSave">+ Messwert speichern</button>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><h3>Verlaufs-Graph</h3></div>
+        <div class="seg c4" style="margin-bottom:10px">
+          <button type="button" class="active" data-bm="weight">Gewicht</button>
+          <button type="button" data-bm="muscle">Muskel</button>
+          <button type="button" data-bm="water">Wasser</button>
+          <button type="button" data-bm="fat">Fett</button>
+        </div>
+        <div class="chart" id="bdChart"></div>
+      </div>
+      <div class="card"><div class="card-hdr"><h3>Messwerte-Tabelle</h3></div><div style="overflow-x:auto" id="bdTbl"></div></div>
+    </div>
+  </section>
+
+  <!-- TAB 7: BACKUP -->
+  <section id="p-bak" class="panel">
+    <div class="card">
+      <div class="card-hdr"><div><h2>System & Datensicherung</h2><p class="sub">Lokaler Speicher: <code>health_life_dashboard_v1</code></p></div></div>
+      <div id="bakWarn" class="alert-box" style="margin-bottom:12px"></div>
+      <div class="stats" style="margin-bottom:12px">
+        <div class="stat"><div class="stat-v" id="stKb">0 KB</div><div class="stat-l">Speicherplatz</div></div>
+        <div class="stat" style="grid-column:span 2"><div class="stat-v" id="stLast" style="font-size:12px">Noch kein Backup</div><div class="stat-l">Letztes JSON-Backup</div></div>
+      </div>
+      <div class="g2" style="margin-bottom:12px">
+        <div class="stat"><div class="stat-v" id="stD">0</div><div class="stat-l">7-Min-Workouts</div></div>
+        <div class="stat"><div class="stat-v" id="stT">0</div><div class="stat-l">Trainingseinheiten</div></div>
+        <div class="stat"><div class="stat-v" id="stB">0</div><div class="stat-l">Blutdruck-Einträge</div></div>
+        <div class="stat"><div class="stat-v" id="stF">0</div><div class="stat-l">Ernährungs-Tage</div></div>
+        <div class="stat"><div class="stat-v" id="stBo">0</div><div class="stat-l">Körper-Messungen</div></div>
+        <div class="stat"><div class="stat-v" id="stFo">0</div><div class="stat-l">Fokus / Mind-Dumps</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button type="button" class="btn btn-blue full" id="expBtn">⬇ JSON-Backup exportieren</button>
+        <label class="btn full" for="impInp" style="cursor:pointer">⬆ JSON-Backup importieren</label>
+        <input type="file" id="impInp" accept=".json,application/json" style="display:none">
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- VERSTECKTE SVG-VORLAGEN -->
+<template id="svg-defs">
+  <svg data-k="halo" viewBox="0 0 220 110" fill="none"><ellipse cx="110" cy="24" rx="44" ry="11" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="5 3"/><path d="M148 19 L155 24 L147 28" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/><circle cx="110" cy="36" r="10" stroke="#f1f5f9" stroke-width="2.5"/><path d="M92 54 H128 L124 84 H96 Z" stroke="#f1f5f9" stroke-width="2.5"/><path d="M92 54 L76 32 L92 22 M128 54 L144 32 L128 22" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/><circle cx="110" cy="15" r="7" fill="#10b981"/><line x1="82" y1="102" x2="138" y2="102" stroke="#10b981" stroke-width="3" stroke-linecap="round"/><line x1="98" y1="84" x2="94" y2="102" stroke="#f1f5f9" stroke-width="2.5"/><line x1="122" y1="84" x2="126" y2="102" stroke="#f1f5f9" stroke-width="2.5"/></svg>
+  <svg data-k="swing2" viewBox="0 0 220 110" fill="none"><path d="M126 88 Q168 72 172 44" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="4 3"/><path d="M167 49 L172 42 L176 50" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/><circle cx="114" cy="30" r="9" stroke="#f1f5f9" stroke-width="2.5"/><path d="M110 39 L94 66 L104 84 L100 102" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/><line x1="108" y1="44" x2="156" y2="48" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/><circle cx="164" cy="49" r="8" fill="#10b981"/><line x1="80" y1="102" x2="122" y2="102" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>
+  <svg data-k="bridge" viewBox="0 0 220 110" fill="none"><line x1="25" y1="96" x2="195" y2="96" stroke="#334668" stroke-width="3" stroke-linecap="round"/><circle cx="52" cy="86" r="8" stroke="#f1f5f9" stroke-width="2.5"/><path d="M62 94 L112 58 L148 64 L162 94" stroke="#f1f5f9" stroke-width="3.5" stroke-linecap="round"/><circle cx="114" cy="47" r="8" fill="#10b981"/><path d="M114 34 V22 M109 27 L114 21 L119 27" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/><line x1="152" y1="96" x2="174" y2="96" stroke="#10b981" stroke-width="3.5" stroke-linecap="round"/></svg>
+  <svg data-k="swing1" viewBox="0 0 220 110" fill="none"><path d="M128 86 Q166 70 170 44" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="4 3"/><circle cx="112" cy="30" r="9" stroke="#f1f5f9" stroke-width="2.5"/><path d="M108 39 L94 66 L102 102" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/><line x1="106" y1="43" x2="156" y2="46" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/><line x1="106" y1="45" x2="80" y2="56" stroke="#64748b" stroke-width="2.2" stroke-linecap="round"/><circle cx="164" cy="47" r="8" fill="#10b981"/><line x1="82" y1="102" x2="122" y2="102" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>
+  <svg data-k="deadbug" viewBox="0 0 220 110" fill="none"><line x1="25" y1="94" x2="195" y2="94" stroke="#334668" stroke-width="3" stroke-linecap="round"/><circle cx="56" cy="84" r="8" stroke="#f1f5f9" stroke-width="2.5"/><line x1="66" y1="90" x2="132" y2="90" stroke="#f1f5f9" stroke-width="4" stroke-linecap="round"/><line x1="82" y1="88" x2="42" y2="74" stroke="#38bdf8" stroke-width="2.8" stroke-linecap="round"/><line x1="86" y1="88" x2="86" y2="52" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/><path d="M132 90 L132 62 L156 62" stroke="#94a3b8" stroke-width="2.8" stroke-linecap="round"/><line x1="132" y1="90" x2="178" y2="78" stroke="#38bdf8" stroke-width="2.8" stroke-linecap="round"/></svg>
+  <svg data-k="birddog" viewBox="0 0 220 110" fill="none"><line x1="25" y1="96" x2="195" y2="96" stroke="#334668" stroke-width="3" stroke-linecap="round"/><rect x="116" y="88" width="26" height="8" rx="3" fill="#f59e0b"/><text x="129" y="83" fill="#fbbf24" font-size="9" font-weight="bold" text-anchor="middle">Polster</text><circle cx="74" cy="48" r="8" stroke="#f1f5f9" stroke-width="2.5"/><line x1="82" y1="54" x2="130" y2="54" stroke="#f1f5f9" stroke-width="3.5" stroke-linecap="round"/><line x1="86" y1="54" x2="86" y2="94" stroke="#94a3b8" stroke-width="2.8" stroke-linecap="round"/><line x1="129" y1="54" x2="129" y2="88" stroke="#f1f5f9" stroke-width="2.8" stroke-linecap="round"/><line x1="82" y1="52" x2="40" y2="48" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/><line x1="130" y1="54" x2="176" y2="50" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/></svg>
+  <svg data-k="armcircles" viewBox="0 0 220 110" fill="none"><circle cx="110" cy="24" r="9" stroke="#f1f5f9" stroke-width="2.5"/><line x1="110" y1="33" x2="110" y2="70" stroke="#f1f5f9" stroke-width="3.5" stroke-linecap="round"/><line x1="62" y1="44" x2="158" y2="44" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/><circle cx="58" cy="44" r="12" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 3"/><circle cx="162" cy="44" r="12" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 3"/><path d="M110 70 L98 102 M110 70 L122 102" stroke="#f1f5f9" stroke-width="2.8" stroke-linecap="round"/><line x1="84" y1="102" x2="136" y2="102" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>
+  <svg data-k="goodmorning" viewBox="0 0 220 110" fill="none"><circle cx="136" cy="42" r="9" stroke="#f1f5f9" stroke-width="2.5"/><path d="M126 36 L116 42 L126 48" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/><path d="M128 47 L90 62 L98 102" stroke="#f1f5f9" stroke-width="3.5" stroke-linecap="round"/><path d="M138 56 Q142 70 128 78" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3 3"/><line x1="80" y1="102" x2="118" y2="102" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>
+  <svg data-k="sldl" viewBox="0 0 220 110" fill="none"><circle cx="148" cy="46" r="8" stroke="#f1f5f9" stroke-width="2.5"/><line x1="60" y1="48" x2="140" y2="48" stroke="#f1f5f9" stroke-width="3.5" stroke-linecap="round"/><line x1="104" y1="48" x2="104" y2="102" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/><line x1="132" y1="48" x2="132" y2="82" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/><line x1="86" y1="102" x2="122" y2="102" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>
+</template>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+"use strict";
+const KEY = "health_life_dashboard_v1";
+const $ = id => document.getElementById(id);
+const svgTpl = $("svg-defs").content;
+
+function getSvg(k) {
+  const n = svgTpl.querySelector('[data-k="' + k + '"]');
+  return n ? n.cloneNode(true) : document.createTextNode("");
+}
+
+function isoDate(d) {
+  const dt = d || new Date();
+  return dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0");
+}
+
+function addDays(iso, n) {
+  const p = iso.split("-").map(Number);
+  const dt = new Date(p[0], p[1] - 1, p[2]);
+  dt.setDate(dt.getDate() + n);
+  return isoDate(dt);
+}
+
+function deDate(iso) {
+  if (!iso || iso.indexOf("-") < 0) return iso || "";
+  const p = iso.split("-");
+  return p[2] + "." + p[1] + "." + p[0];
+}
+
+function defState() {
+  return {
+    version: 1, lastBackup: null, dailyWorkouts: {}, trainingLogs: [], bpLogs: [],
+    cognitionLogs: {}, mindDumps: [], bodyLogs: [], customWeights: {},
+    mindDumpDraft: { q1: "", q2: "", q3: "" }, foodLogs: {}
+  };
+}
+
+let state = (function() {
+  const d = defState();
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return d;
+    const p = JSON.parse(raw);
+    if (!p || typeof p !== "object") return d;
+    return {
+      version: 1,
+      lastBackup: p.lastBackup || null,
+      dailyWorkouts: p.dailyWorkouts && typeof p.dailyWorkouts === "object" ? p.dailyWorkouts : {},
+      trainingLogs: Array.isArray(p.trainingLogs) ? p.trainingLogs : [],
+      bpLogs: Array.isArray(p.bpLogs) ? p.bpLogs : [],
+      cognitionLogs: p.cognitionLogs && typeof p.cognitionLogs === "object" ? p.cognitionLogs : {},
+      mindDumps: Array.isArray(p.mindDumps) ? p.mindDumps : [],
+      bodyLogs: Array.isArray(p.bodyLogs) ? p.bodyLogs : [],
+      customWeights: p.customWeights && typeof p.customWeights === "object" ? p.customWeights : {},
+      mindDumpDraft: p.mindDumpDraft && typeof p.mindDumpDraft === "object"
+        ? { q1: p.mindDumpDraft.q1 || "", q2: p.mindDumpDraft.q2 || "", q3: p.mindDumpDraft.q3 || "" }
+        : { q1: "", q2: "", q3: "" },
+      foodLogs: p.foodLogs && typeof p.foodLogs === "object" ? p.foodLogs : {}
+    };
+  } catch (e) { return d; }
+})();
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+let toastT = null;
+function toast(msg) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove("show"), 2300);
+}
+
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  if (attrs) {
+    Object.keys(attrs).forEach(k => {
+      if (k === "cls") node.className = attrs[k];
+      else if (k === "txt") node.textContent = attrs[k];
+      else node.setAttribute(k, attrs[k]);
+    });
+  }
+  if (children) {
+    (Array.isArray(children) ? children : [children]).forEach(c => {
+      if (c) node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+  }
+  return node;
+}
+
+/* Audio & WakeLock */
+let actx = null, sndOn = true, wakeLock = null, keepAwake = false;
+function tone(f, ms, del) {
+  if (!sndOn) return;
+  try {
+    if (!actx) { const C = window.AudioContext || window.webkitAudioContext; if (C) actx = new C(); }
+    if (!actx) return;
+    if (actx.state === "suspended") actx.resume();
+    const t = actx.currentTime + (del || 0) / 1000;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.exponentialRampToValueAtTime(0.18, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.001, t + ms / 1000);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t + ms / 1000 + 0.02);
+  } catch (e) {}
+}
+function cue(type) {
+  if (type === "tick") { tone(520, 90); if (navigator.vibrate) navigator.vibrate(40); }
+  else if (type === "start") { tone(880, 250); if (navigator.vibrate) navigator.vibrate(120); }
+  else if (type === "rest") { tone(620, 140); tone(440, 180, 170); if (navigator.vibrate) navigator.vibrate([80, 60, 80]); }
+  else if (type === "done") { tone(587, 140); tone(740, 140, 160); tone(880, 320, 320); if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 220]); }
+  else if (type === "breath") { tone(432, 150); }
+}
+async function lockScreen() {
+  keepAwake = true;
+  if (!("wakeLock" in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+    $("wakePill").textContent = "Display: Wach";
+    $("wakePill").classList.add("on");
+  } catch (e) {}
+}
+function unlockScreen() {
+  keepAwake = false;
+  $("wakePill").textContent = "Display: Auto";
+  $("wakePill").classList.remove("on");
+  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && keepAwake) lockScreen(); });
+
+/* Tab-Wechsel */
+function switchTab(tabId) {
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x.getAttribute("data-t") === tabId));
+  document.querySelectorAll(".panel").forEach(x => x.classList.toggle("active", x.id === tabId));
+  $("mainBox").scrollTop = 0;
+  if (tabId === "p-daily") updateDailyOverview();
+  if (tabId === "p-bak") renderBackup();
+  if (tabId === "p-bp") renderBp();
+  if (tabId === "p-body") { renderCal(); renderFoodDay(); renderBody(); }
+}
+
+document.querySelectorAll(".tab").forEach(b => {
+  b.addEventListener("click", () => switchTab(b.getAttribute("data-t")));
+});
+
+/* Tages-Status-Indikator auf Tab 1 */
+function updateDailyOverview() {
+  const tod = isoDate();
+  const fl = state.foodLogs[tod];
+  const hasBf = !!(fl && fl.breakfast && fl.breakfast.trim());
+  const fChip = $("stFoodChip"), fTxt = $("stFoodTxt"), fBadge = $("stFoodBadge");
+  fChip.classList.toggle("ok", hasBf);
+  if (hasBf) {
+    const raw = fl.breakfast.trim();
+    fTxt.textContent = raw.length > 22 ? raw.slice(0, 21) + "…" : raw;
+    fBadge.textContent = "✓ Ja";
+    fBadge.className = "badge b-grn";
+  } else {
+    fTxt.textContent = "Noch nicht geplant";
+    fBadge.textContent = "Offen";
+    fBadge.className = "badge b-amb";
+  }
+
+  const cl = state.cognitionLogs[tod] || {};
+  const cnt = (cl.c1 ? 1 : 0) + (cl.c2 ? 1 : 0) + (cl.c3 ? 1 : 0);
+  const cChip = $("stFocChip"), cTxt = $("stFocTxt"), cBadge = $("stFocBadge");
+  cChip.classList.remove("ok", "part");
+  if (cnt === 3) {
+    cChip.classList.add("ok");
+    cTxt.textContent = "Alle 3 Haken gesetzt";
+    cBadge.textContent = "✓ 3/3";
+    cBadge.className = "badge b-grn";
+  } else if (cnt > 0) {
+    cChip.classList.add("part");
+    cTxt.textContent = cnt + " von 3 erledigt";
+    cBadge.textContent = cnt + "/3";
+    cBadge.className = "badge b-amb";
+  } else {
+    cTxt.textContent = "0 von 3 erledigt";
+    cBadge.textContent = "0/3";
+    cBadge.className = "badge b-blue";
+  }
+}
+
+$("stFoodChip").addEventListener("click", () => {
+  const n = new Date();
+  fDate = isoDate(n); calY = n.getFullYear(); calM = n.getMonth();
+  switchTab("p-body");
+  $("subFoodBtn").click();
+  setTimeout(() => { $("fdB").focus(); }, 60);
+});
+
+$("stFocChip").addEventListener("click", () => {
+  focDate = isoDate();
+  renderFocus();
+  switchTab("p-focus");
+});
+
+/* TAB 1: WORKOUT */
+const PLANS = {
+  kettlebell: [
+    { t: "1. Kettlebell Halos (10 kg)", c: "Fokus: Flacher Fußstand · Rumpf fest · Nach 22s Richtung wechseln", g: "Hüftbreiter, flacher Fußstand. Halte die 10-kg-Kettlebell an den Hörnern vor der Brust. Führe sie eng und kontrolliert um den Kopf herum, ohne mit dem Oberkörper auszuweichen. Nach der Hälfte die Drehrichtung wechseln.", s: "halo" },
+    { t: "2. Swings beidarmig (10 kg)", c: "Fokus: Flacher Fußstand · Explosiver Hüft-Hinge · Rücken gerade", g: "Schulterbreiter, flacher Fußstand. Schiebe die Hüfte nach hinten (keine Kniebeuge!), greife die Kettlebell beidarmig und strecke die Hüfte explosiv nach vorn. Die Arme führen nur.", s: "swing2" },
+    { t: "3. Glute Bridges (+ 10 kg Kettlebell)", c: "Fokus: Flacher Fußstand · Oben 2 Sek. halten · Gesäß anspannen", g: "Rückenlage, Füße hüftbreit und komplett flach aufstellen. Die 10-kg-Kettlebell sicher auf dem Becken fixieren. Drücke die Hüfte über die Fersen nach oben, halte oben 2 Sekunden die Spannung.", s: "bridge" },
+    { t: "4. Swings einarmig Rechts (10 kg)", c: "Fokus: Schulterblatt stabilisieren · Rotation im Rumpf verhindern", g: "Führe den Swing nur mit der rechten Hand aus. Halte die rechte Schulter tief im Gelenk und spanne die Bauchmuskeln aktiv an, damit der Oberkörper beim Schwung nicht zur Seite verdreht.", s: "swing1" },
+    { t: "5. Dead Bugs", c: "Fokus: Unterer Rücken fest am Boden · Ruhig ausatmen", g: "Rückenlage, Knie und Hüfte im 90°-Winkel angehoben, Arme senkrecht nach oben. Strecke langsam rechten Arm und linkes Bein Richtung Boden aus, während der untere Rücken Bodenkontakt hält.", s: "deadbug" },
+    { t: "6. Swings einarmig Links (10 kg)", c: "Fokus: Symmetrische Hüftstreckung · Linke Schulter tief halten", g: "Gleicher Ablauf wie rechts, nun mit der linken Hand. Achte auf einen stabilen, flachen Fußstand und eine gleichmäßige, kraftvolle Hüftstreckung.", s: "swing1" },
+    { t: "7. Bird-Dog (mit Kniepolster)", c: "Fokus: Kniepolster/Matte unterlegen! · 2 Sek. halten · Kein Hohlkreuz", g: "Vierfüßlerstand (unbedingt ein Kniepolster oder eine weiche Matte unterlegen!). Strecke gleichzeitig den rechten Arm nach vorn und das linke Bein waagerecht nach hinten. Oben 2 Sekunden halten, kein Hohlkreuz.", s: "birddog" }
+  ],
+  bodyweight: [
+    { t: "1. Arm Circles & Shoulder Rolls", c: "Fokus: Flacher Fußstand · Brustkorb offen · Kontrollierte Kreise", g: "Aufrechter, flacher Fußstand. Breite beide Arme seitlich aus und beschreibe kontrollierte Kreise aus den Schultergelenken heraus. Nach 22 Sekunden Richtung wechseln.", s: "armcircles" },
+    { t: "2. Bodyweight Good Mornings", c: "Fokus: Flacher Fußstand · Langer Rücken · Dehnung Beinrückseite", g: "Hüftbreiter, flacher Fußstand, Hände locker an den Schläfen. Knie leicht entriegeln und den Oberkörper mit geradem Rücken nach vorn neigen, indem das Gesäß nach hinten geschoben wird.", s: "goodmorning" },
+    { t: "3. Glute Bridges (Bodyweight)", c: "Fokus: Flacher Fußstand · Oben 2 Sek. maximale Spannung", g: "Rückenlage, Füße flach aufgestellt. Drücke das Becken hoch, bis Oberschenkel und Oberkörper eine Linie bilden. Oben 2 Sekunden bewusst anspannen, langsam absenken.", s: "bridge" },
+    { t: "4. Single-Leg Deadlift Rechts", c: "Fokus: Standfuß flach & stabil · Hüfte parallel zum Boden", g: "Stehe flach auf dem rechten Fuß, Knie minimal gebeugt. Neige den Oberkörper nach vorn, während das linke Bein gestreckt nach hinten steigt (Standwaage). Kontrolliert aufrichten.", s: "sldl" },
+    { t: "5. Dead Bugs", c: "Fokus: Lendenwirbelsäule bleibt am Boden · Langsame Kontrolle", g: "Rückenlage, Arme und Beine angehoben. Strecke diagonal Arm und Bein aus, atme tief aus und halte die Bauchspannung so hoch, dass kein Hohlkreuz entsteht.", s: "deadbug" },
+    { t: "6. Single-Leg Deadlift Links", c: "Fokus: Linker Fuß flach verankert · Ruhige Balance", g: "Wechsle auf das linke Standbein. Halte den Blick auf einen festen Punkt am Boden gerichtet und führe die Standwaage langsam und ohne Hast aus.", s: "sldl" },
+    { t: "7. Bird-Dog (mit Kniepolster)", c: "Fokus: Kniepolster/Matte unterlegen! · 2 Sek. halten · Rumpf stabil", g: "Vierfüßlerstand auf einem Kniepolster oder einer Matte. Strecke diagonal Arm und Bein lang aus, halte die Position 2 Sekunden ruhig und kehre kontrolliert zurück.", s: "birddog" }
+  ]
+};
+
+let wMode = "kettlebell", tState = "idle", exIdx = 0, endTs = 0, durMs = 45000, tInt = null, lastBeep = -1;
+const openSet = new Set();
+
+function displayExIdx() {
+  if (tState === "rest") return Math.min(exIdx + 1, PLANS[wMode].length - 1);
+  return exIdx;
+}
+
+function renderActiveEx() {
+  const showIdx = displayExIdx();
+  const ex = PLANS[wMode][showIdx] || PLANS[wMode][0];
+  $("tExTitle").textContent = (tState === "rest" ? "Vorbereiten → " : "") + ex.t;
+  $("tSvg").innerHTML = "";
+  $("tSvg").appendChild(getSvg(ex.s));
+  $("tCue").textContent = ex.c;
+  $("tGuide").textContent = ex.g;
+}
+
+function renderExList() {
+  const box = $("exList");
+  box.innerHTML = "";
+  PLANS[wMode].forEach((ex, i) => {
+    const key = wMode + "_" + i;
+    const isCur = i === exIdx && (tState === "prep" || tState === "work");
+    const isNext = i === (exIdx + 1) && tState === "rest";
+    const isOpen = openSet.has(key);
+    const jumpBtn = el("button", { type: "button", cls: "btn btn-sm", txt: "Hierhin springen" });
+    jumpBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      exIdx = i;
+      if (tState === "idle" || tState === "done") { renderActiveEx(); renderExList(); toast("Übung " + (i + 1) + " gewählt"); }
+      else { setPhase("work", 45); toast("Sprung zu Übung " + (i + 1)); }
+    });
+    const rightControls = [];
+    if (isCur) rightControls.push(el("span", { cls: "badge b-grn", txt: "Aktiv" }));
+    else if (isNext) rightControls.push(el("span", { cls: "badge b-blue", txt: "Gleich dran" }));
+    rightControls.push(jumpBtn);
+    rightControls.push(el("span", { style: "color:var(--mut);font-size:12px", txt: isOpen ? "▲" : "▼" }));
+
+    const hdr = el("div", { cls: "item-hdr" }, [
+      el("span", { style: "font-size:13px;font-weight:700", txt: ex.t }),
+      el("div", { style: "display:flex;align-items:center;gap:6px;flex-shrink:0" }, rightControls)
+    ]);
+    hdr.addEventListener("click", () => {
+      if (openSet.has(key)) openSet.delete(key); else openSet.add(key);
+      renderExList();
+    });
+    const svgWrap = el("div", { cls: "svg-box" }, getSvg(ex.s));
+    const drawer = el("div", { cls: "drawer" + (isOpen ? " open" : "") }, [svgWrap, el("div", { cls: "cue", txt: ex.c }), el("p", { cls: "sub", txt: ex.g })]);
+    const itemCls = "item" + (isCur ? " cur" : (isNext ? " nxt" : ""));
+    box.appendChild(el("div", { cls: itemCls }, [hdr, drawer]));
+  });
+}
+
+function setPhase(ph, sec) {
+  tState = ph; durMs = sec * 1000; endTs = Date.now() + durMs; lastBeep = -1;
+  $("tStage").className = "stage " + ph;
+  if (ph === "prep") $("tPhase").textContent = "VORBEREITUNG (5s) · BEREIT MACHEN";
+  else if (ph === "work") { $("tPhase").textContent = "BELASTUNG · ÜBUNG " + (exIdx + 1) + " / 7"; cue("start"); }
+  else if (ph === "rest") { $("tPhase").textContent = "PAUSE / VORBEREITUNG · GLEICH ÜBUNG " + (exIdx + 2) + " / 7"; cue("rest"); }
+  renderActiveEx(); renderExList(); tick();
+}
+
+function tick() {
+  if (tState === "idle" || tState === "done") return;
+  const rem = Math.max(0, endTs - Date.now());
+  const sec = Math.ceil(rem / 1000);
+  $("tDigits").textContent = String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
+  $("tFill").style.width = Math.min(100, ((durMs - rem) / durMs) * 100) + "%";
+  if (sec <= 3 && sec >= 1 && sec !== lastBeep) { lastBeep = sec; cue("tick"); }
+  if (rem <= 0) {
+    if (tState === "prep") setPhase("work", 45);
+    else if (tState === "work") {
+      if (exIdx >= 6) {
+        clearInterval(tInt); tInt = null; tState = "done"; unlockScreen(); cue("done");
+        $("tStage").className = "stage done"; $("tPhase").textContent = "GESCHAFFT · 7/7 ABGESCHLOSSEN";
+        $("tDigits").textContent = "00:00"; $("tFill").style.width = "100%"; $("tStart").textContent = "▶ Erneut starten";
+        state.dailyWorkouts[isoDate()] = { completed: true, mode: wMode, timestamp: new Date().toISOString() };
+        save(); updateDailyStat(); renderExList(); toast("Stark! 7-Minuten-Einheit gespeichert.");
+      } else setPhase("rest", 15);
+    } else if (tState === "rest") { exIdx++; setPhase("work", 45); }
+  }
+}
+
+$("tStart").addEventListener("click", () => {
+  lockScreen();
+  if (tState === "idle" || tState === "done") {
+    exIdx = 0; setPhase("prep", 5); $("tStart").textContent = "⏸ Läuft...";
+    clearInterval(tInt); tInt = setInterval(tick, 200);
+  }
+});
+$("tReset").addEventListener("click", () => {
+  clearInterval(tInt); tInt = null; tState = "idle"; exIdx = 0; unlockScreen();
+  $("tStage").className = "stage"; $("tPhase").textContent = "BEREIT · 7 ÜBUNGEN";
+  $("tDigits").textContent = "00:45"; $("tFill").style.width = "0%"; $("tStart").textContent = "▶ Starten";
+  renderActiveEx(); renderExList();
+});
+$("sndBtn").addEventListener("click", e => { sndOn = !sndOn; e.target.textContent = sndOn ? "🔊 Ton an" : "🔇 Ton aus"; if (sndOn) tone(660, 90); });
+document.querySelectorAll("[data-wm]").forEach(b => b.addEventListener("click", () => {
+  wMode = b.getAttribute("data-wm");
+  $("mKb").classList.toggle("active", wMode === "kettlebell");
+  $("mBw").classList.toggle("active", wMode === "bodyweight");
+  $("tReset").click();
+}));
+function updateDailyStat() {
+  const ok = !!state.dailyWorkouts[isoDate()];
+  $("dailyStat").textContent = ok ? "Heute: ✓ Abgeschlossen" : "Heute: Noch offen";
+  $("dailyStat").style.color = ok ? "#34d399" : "var(--mut)";
+}
+
+/* TAB 2: TRAINING */
+const TPLANS = {
+  studio: [
+    { id: "mx_legpress", t: "1. Sitzende Beinpresse", w: "50 kg", r: "3×12-15", d: "Empfehlung 40–60 kg · Flacher Fußstand mittig auf der Platte, 90° Kniewinkel, Knie nicht komplett durchdrücken." },
+    { id: "mx_calf", t: "2. Wadendrücken an der Beinpresse", w: "45 kg", r: "3×15-20", d: "Kontrollierte Dehnung der Wade und ruhige Streckung, am obersten Punkt 1 Sek. halten." },
+    { id: "mx_legcurl", t: "3. Liegender Beinbeuger", w: "30 kg", r: "3×12-15", d: "Kniegelenk exakt auf Höhe der Drehachse ausrichten, Hüfte fest am Polster lassen." },
+    { id: "mx_abductor", t: "4. Abduktoren-Maschine", w: "40 kg", r: "3×15", d: "Aufrecht sitzen, Rücken anlehnen, Beine kontrolliert nach außen führen." },
+    { id: "mx_adductor", t: "5. Adduktoren-Maschine", w: "40 kg", r: "3×15", d: "Ruhig zusammenführen ohne Aufschlagen der Gewichte." },
+    { id: "mx_crosstrainer", t: "6. Crosstrainer (Cardio)", w: "Stufe 7", r: "20 Min.", d: "Durchgehend flacher Fußstand auf den Pedalen, Zielpuls 120–135 BPM." }
+  ],
+  home: [
+    { id: "hm_bench", t: "1. Langhantel-Bankdrücken", w: "35 kg", r: "3×10-12", d: "Flacher Fußstand am Boden, Schulterblätter fixiert, Stange kontrolliert zur Brust führen." },
+    { id: "hm_row", t: "2. Kurzhantel-Rudern einarmig", w: "10 kg", r: "3×12-15 je Seite", d: "Auf Bank abstützen, Rücken gerade halten, aus dem Schulterblatt ziehen." },
+    { id: "hm_ohp", t: "3. Schulterdrücken (Kurzhanteln)", w: "2×10 kg", r: "3×10-12", d: "Sitzend oder im flachen Stand, Rumpf fest, kein Hohlkreuz." },
+    { id: "hm_curl", t: "4. Kurzhantel-Bizeps-Curls", w: "2×10 kg", r: "3×12-15", d: "Flacher Fußstand, Ellenbogen am Körper fixiert, sauber ohne Schwung." },
+    { id: "hm_triceps", t: "5. Trizeps-Drücken / French Press", w: "10 kg", r: "3×12-15", d: "Oberarme senkrecht fixieren, kontrolliert absenken und sauber strecken." }
+  ]
+};
+let tPlan = "studio";
+function renderTrPlan() {
+  const box = $("trCards");
+  box.innerHTML = "";
+  TPLANS[tPlan].forEach(ex => {
+    const sv = state.customWeights[ex.id] || {};
+    const chk = el("input", { type: "checkbox", "data-eid": ex.id }); chk.checked = true;
+    const card = el("div", { cls: "item" });
+    chk.addEventListener("change", () => card.classList.toggle("dim", !chk.checked));
+    const top = el("label", { style: "display:flex;align-items:flex-start;gap:9px;cursor:pointer" }, [
+      chk,
+      el("div", null, [el("div", { style: "font-size:13.5px;font-weight:700", txt: ex.t }), el("div", { cls: "sub", txt: ex.d })])
+    ]);
+    const wInp = el("input", { type: "text", "data-wid": ex.id, value: sv.weight !== undefined ? sv.weight : ex.w });
+    const rInp = el("input", { type: "text", "data-rid": ex.id, value: sv.reps !== undefined ? sv.reps : ex.r });
+    const inps = el("div", { cls: "t-inps" }, [
+      el("div", null, [el("label", { cls: "lbl", txt: "Gewicht / Stufe" }), wInp]),
+      el("div", null, [el("label", { cls: "lbl", txt: "Sätze × Wdh." }), rInp])
+    ]);
+    card.appendChild(top); card.appendChild(inps); box.appendChild(card);
+  });
+}
+function renderTrHist() {
+  $("trCnt").textContent = String(state.trainingLogs.length);
+  const box = $("trHist"); box.innerHTML = "";
+  if (!state.trainingLogs.length) { box.appendChild(el("p", { cls: "sub", txt: "Noch keine Trainingseinheiten gespeichert." })); return; }
+  state.trainingLogs.slice(-8).reverse().forEach(l => {
+    const txt = (l.exercises || []).map(e => e.title.replace(/^\d+\.\s*/, "") + ": " + e.weight + " (" + e.reps + ")").join(" · ");
+    const hdr = el("div", { style: "display:flex;justify-content:space-between;align-items:center;margin-bottom:4px" }, [
+      el("strong", { style: "font-size:13px", txt: deDate(l.date) + " · " + (l.plan === "home" ? "Heim-Gym" : "Fitnessstudio") }),
+      el("span", { cls: "badge b-grn", txt: (l.exercises || []).length + " Übungen" })
+    ]);
+    const it = el("div", { cls: "item" }, [hdr, el("div", { style: "font-size:11.5px;color:var(--mut)", txt })]);
+    if (l.notes) it.appendChild(el("div", { style: "font-size:11.5px;color:var(--blue);margin-top:4px", txt: "Notiz: " + l.notes }));
+    box.appendChild(it);
+  });
+}
+document.querySelectorAll("[data-tp]").forEach(b => b.addEventListener("click", () => {
+  tPlan = b.getAttribute("data-tp");
+  $("plMx").classList.toggle("active", tPlan === "studio");
+  $("plHm").classList.toggle("active", tPlan === "home");
+  renderTrPlan();
+}));
+$("trSave").addEventListener("click", () => {
+  const done = [];
+  TPLANS[tPlan].forEach(ex => {
+    const chk = document.querySelector('[data-eid="' + ex.id + '"]');
+    const w = document.querySelector('[data-wid="' + ex.id + '"]').value.trim() || ex.w;
+    const r = document.querySelector('[data-rid="' + ex.id + '"]').value.trim() || ex.r;
+    state.customWeights[ex.id] = { weight: w, reps: r };
+    if (chk && chk.checked) done.push({ id: ex.id, title: ex.t, weight: w, reps: r });
+  });
+  if (!done.length) { toast("Bitte mindestens eine Übung abhaken."); return; }
+  state.trainingLogs.push({ id: Date.now(), date: $("trDate").value || isoDate(), plan: tPlan, exercises: done, notes: $("trNote").value.trim() });
+  save(); $("trNote").value = ""; renderTrHist(); toast("Training & Gewichte gespeichert!");
+});
+
+/* TAB 3: BLUTDRUCK */
+let bpTime = new Date().getHours() < 14 ? "morning" : "evening";
+function syncBpTime() {
+  $("bpMorn").classList.toggle("active", bpTime === "morning");
+  $("bpEve").classList.toggle("active", bpTime === "evening");
+}
+document.querySelectorAll("[data-bt]").forEach(b => b.addEventListener("click", () => { bpTime = b.getAttribute("data-bt"); syncBpTime(); }));
+function bpCat(s, d) {
+  if (s >= 140 || d >= 90) return { l: "Erhöht", c: "b-red" };
+  if (s >= 130 || d >= 85) return { l: "Leicht erhöht", c: "b-amb" };
+  return { l: "Normal", c: "b-grn" };
+}
+function renderBp() {
+  const sorted = state.bpLogs.slice().sort((a, b) => a.date.localeCompare(b.date) || (a.timeOfDay === "morning" ? -1 : 1));
+  const last = sorted.slice(-14);
+  if (!last.length) {
+    $("bpAvg").textContent = "--/--"; $("bpAvgP").textContent = "--"; $("bpMM").textContent = "-- / --";
+    $("bpBadge").textContent = "Keine Daten"; $("bpBadge").className = "badge b-blue";
+    $("bpChart").innerHTML = '<div style="text-align:center;padding:20px;color:var(--mut);font-size:12px">Noch keine Messwerte vorhanden.</div>';
+    $("bpHist").innerHTML = '<p class="sub">Erfasse oben deine erste Messung.</p>';
+    return;
+  }
+  const aS = Math.round(last.reduce((a, b) => a + b.sys, 0) / last.length);
+  const aD = Math.round(last.reduce((a, b) => a + b.dia, 0) / last.length);
+  const aP = Math.round(last.reduce((a, b) => a + b.pulse, 0) / last.length);
+  $("bpAvg").textContent = aS + "/" + aD;
+  $("bpAvgP").textContent = String(aP);
+  $("bpMM").textContent = Math.min(...last.map(x => x.sys)) + " / " + Math.max(...last.map(x => x.sys));
+  const cat = bpCat(aS, aD);
+  $("bpBadge").textContent = "Ø " + cat.l; $("bpBadge").className = "badge " + cat.c;
+
+  const W = 320, H = 140, pL = 28, pR = 12, pT = 14, pB = 20, pW = W - pL - pR, pH = H - pT - pB;
+  const vals = last.flatMap(x => [x.sys, x.dia]);
+  const yMin = Math.min(55, Math.min(...vals) - 5), yMax = Math.max(155, Math.max(...vals) + 5);
+  const gx = i => last.length === 1 ? pL + pW / 2 : pL + (i / (last.length - 1)) * pW;
+  const gy = v => pT + pH - ((v - yMin) / (yMax - yMin)) * pH;
+  const sPts = last.map((d, i) => gx(i).toFixed(1) + "," + gy(d.sys).toFixed(1)).join(" ");
+  const dPts = last.map((d, i) => gx(i).toFixed(1) + "," + gy(d.dia).toFixed(1)).join(" ");
+  const dots = last.map((d, i) => '<circle cx="' + gx(i).toFixed(1) + '" cy="' + gy(d.sys).toFixed(1) + '" r="3" fill="#38bdf8"/><circle cx="' + gx(i).toFixed(1) + '" cy="' + gy(d.dia).toFixed(1) + '" r="3" fill="#10b981"/>').join("");
+  $("bpChart").innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block"><line x1="' + pL + '" y1="' + gy(130) + '" x2="' + (W - pR) + '" y2="' + gy(130) + '" stroke="#f59e0b" stroke-dasharray="3 3" opacity=".6"/><text x="2" y="' + (gy(130) + 3) + '" fill="#fbbf24" font-size="9">130</text><line x1="' + pL + '" y1="' + gy(85) + '" x2="' + (W - pR) + '" y2="' + gy(85) + '" stroke="#10b981" stroke-dasharray="3 3" opacity=".5"/><text x="4" y="' + (gy(85) + 3) + '" fill="#34d399" font-size="9">85</text><polyline fill="none" stroke="#38bdf8" stroke-width="2.2" points="' + sPts + '"/><polyline fill="none" stroke="#10b981" stroke-width="2.2" points="' + dPts + '"/>' + dots + '<text x="' + pL + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9">' + deDate(last[0].date).slice(0, 5) + '</text><text x="' + (W - pR) + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9" text-anchor="end">' + deDate(last[last.length - 1].date).slice(0, 5) + '</text></svg>';
+
+  const tbl = el("table");
+  tbl.appendChild(el("thead", null, el("tr", null, ["Datum", "Zeit", "RR", "Puls", "Status", ""].map(h => el("th", { txt: h })))));
+  const tb = el("tbody");
+  sorted.slice(-10).reverse().forEach(it => {
+    const c = bpCat(it.sys, it.dia);
+    const del = el("button", { type: "button", cls: "btn btn-sm btn-red", txt: "×" });
+    del.addEventListener("click", () => { state.bpLogs = state.bpLogs.filter(x => x.id !== it.id); save(); renderBp(); toast("Gelöscht."); });
+    tb.appendChild(el("tr", null, [
+      el("td", { txt: deDate(it.date) }),
+      el("td", { txt: it.timeOfDay === "morning" ? "☀" : "☾" }),
+      el("td", null, el("strong", { txt: it.sys + "/" + it.dia })),
+      el("td", { txt: String(it.pulse) }),
+      el("td", null, el("span", { cls: "badge " + c.c, txt: c.l })),
+      el("td", { style: "text-align:right" }, del)
+    ]));
+  });
+  tbl.appendChild(tb);
+  $("bpHist").innerHTML = ""; $("bpHist").appendChild(tbl);
+}
+$("bpSave").addEventListener("click", () => {
+  const sys = Number($("bpSys").value), dia = Number($("bpDia").value), pulse = Number($("bpPul").value);
+  if (!sys || !dia || !pulse || sys < 60 || dia < 35) { toast("Bitte gültige Werte eingeben."); return; }
+  state.bpLogs.push({ id: Date.now(), date: $("bpDate").value || isoDate(), timeOfDay: bpTime, sys, dia, pulse });
+  save(); $("bpSys").value = ""; $("bpDia").value = ""; $("bpPul").value = ""; renderBp(); toast("Blutdruck gespeichert.");
+});
+
+/* TAB 4: FOKUS */
+let focDate = isoDate();
+function getCog(iso) {
+  if (!state.cognitionLogs[iso]) state.cognitionLogs[iso] = { c1: false, c2: false, c3: false, note: "" };
+  return state.cognitionLogs[iso];
+}
+function renderFocus() {
+  const tod = isoDate(), isTod = focDate === tod, e = getCog(focDate);
+  $("focLbl").textContent = isTod ? "Heute, " + deDate(focDate) : "Rückblick: " + deDate(focDate);
+  $("focToday").style.display = isTod ? "none" : "inline-flex";
+  [1, 2, 3].forEach(i => {
+    $("fChk" + i).checked = !!e["c" + i];
+    $("fRow" + i).classList.toggle("on", !!e["c" + i]);
+  });
+  $("fNote").value = e.note || "";
+  const g = $("fGrid"); g.innerHTML = "";
+  const dn = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+  for (let o = -6; o <= 0; o++) {
+    const iso = addDays(tod, o), p = iso.split("-").map(Number), dt = new Date(p[0], p[1] - 1, p[2]);
+    const lg = state.cognitionLogs[iso] || {};
+    const chip = el("div", { cls: "d7-c" + (iso === focDate ? " sel" : "") }, [
+      el("div", { style: "font-size:10px;color:var(--mut)", txt: dn[dt.getDay()] }),
+      el("div", { style: "font-size:12px;font-weight:700;margin:2px 0", txt: p[2] + "." }),
+      el("div", { cls: "dots" }, [1, 2, 3].map(k => el("span", { cls: "dot" + (lg["c" + k] ? " on" : "") })))
+    ]);
+    chip.addEventListener("click", () => { focDate = iso; renderFocus(); });
+    g.appendChild(chip);
+  }
+  updateDailyOverview();
+}
+[1, 2, 3].forEach(i => $("fChk" + i).addEventListener("change", e => { getCog(focDate)["c" + i] = e.target.checked; save(); renderFocus(); }));
+$("fNote").addEventListener("input", e => { getCog(focDate).note = e.target.value; save(); $("fSav").textContent = "Gespeichert ✓"; setTimeout(() => { $("fSav").textContent = "Speichert automatisch"; }, 1100); });
+$("focToday").addEventListener("click", () => { focDate = isoDate(); renderFocus(); });
+
+/* TAB 5: RUHE */
+const BR_PH = [{ l: "Einatmen", s: 1.55 }, { l: "Halten", s: 1.55 }, { l: "Ausatmen", s: 1.0 }, { l: "Halten", s: 1.0 }];
+let brRun = false, brInt = null, brIdx = 0, brEnd = 0, brRnd = 0, brSnd = true;
+function updBreath() {
+  if (!brRun) { $("brCirc").style.transform = "scale(1)"; $("brPh").textContent = "Bereit"; $("brSec").textContent = "4s"; return; }
+  const rem = Math.max(0, brEnd - Date.now()), sec = Math.ceil(rem / 1000), ph = BR_PH[brIdx];
+  $("brPh").textContent = ph.l; $("brSec").textContent = sec + "s";
+  const pr = 1 - rem / 4000;
+  const sc = brIdx === 0 ? 1 + 0.55 * pr : (brIdx === 2 ? 1.55 - 0.55 * pr : ph.s);
+  $("brCirc").style.transform = "scale(" + sc.toFixed(3) + ")";
+  if (rem <= 0) {
+    brIdx = (brIdx + 1) % 4;
+    if (brIdx === 0) { brRnd++; $("brRounds").textContent = "Abgeschlossene Runden: " + brRnd; }
+    brEnd = Date.now() + 4000; if (brSnd) cue("breath");
+  }
+}
+$("brStart").addEventListener("click", () => { if (brRun) return; lockScreen(); brRun = true; brIdx = 0; brEnd = Date.now() + 4000; if (brSnd) cue("breath"); clearInterval(brInt); brInt = setInterval(updBreath, 100); updBreath(); });
+$("brStop").addEventListener("click", () => { brRun = false; clearInterval(brInt); brInt = null; if (tState === "idle" || tState === "done") unlockScreen(); updBreath(); });
+$("brSnd").addEventListener("click", e => { brSnd = !brSnd; e.target.textContent = brSnd ? "🔊 Ton an" : "🔇 Ton aus"; });
+
+function renderDumps() {
+  const box = $("dHist"); box.innerHTML = "";
+  if (!state.mindDumps.length) return;
+  box.appendChild(el("h4", { style: "font-size:13px;margin:0 0 8px;color:var(--mut)", txt: "Letzte Einträge" }));
+  state.mindDumps.slice(-5).reverse().forEach(d => {
+    const it = el("div", { cls: "item" }, el("div", { style: "font-size:11.5px;font-weight:700;color:var(--blue);margin-bottom:4px", txt: deDate(d.date) }));
+    if (d.q1) it.appendChild(el("div", { style: "font-size:12px", txt: "Belastend: " + d.q1 }));
+    if (d.q2) it.appendChild(el("div", { style: "font-size:12px", txt: "Losgelassen: " + d.q2 }));
+    if (d.q3) it.appendChild(el("div", { style: "font-size:12px;color:#a7f3d0", txt: "Gut heute: " + d.q3 }));
+    box.appendChild(it);
+  });
+}
+[1, 2, 3].forEach(i => {
+  $("dq" + i).value = state.mindDumpDraft["q" + i] || "";
+  $("dq" + i).addEventListener("input", e => { state.mindDumpDraft["q" + i] = e.target.value; save(); });
+});
+$("dSave").addEventListener("click", () => {
+  const q1 = $("dq1").value.trim(), q2 = $("dq2").value.trim(), q3 = $("dq3").value.trim();
+  if (!q1 && !q2 && !q3) { toast("Bitte mindestens ein Feld ausfüllen."); return; }
+  state.mindDumps.push({ id: Date.now(), date: isoDate(), q1, q2, q3 });
+  state.mindDumpDraft = { q1: "", q2: "", q3: "" };
+  $("dq1").value = ""; $("dq2").value = ""; $("dq3").value = "";
+  save(); renderDumps(); toast("Mind-Dump gespeichert & Kopf frei!");
+});
+
+/* TAB 6: KÖRPER & ESSEN + MEAL-PREP REZEPTE */
+let fDate = isoDate(), calY = new Date().getFullYear(), calM = new Date().getMonth(), bMetric = "weight";
+
+const RECIPES = [
+  {
+    id: "apfel_oats",
+    label: "🥣 Apfel-Vanille Overnight Oats (435 kcal | 39g EW)",
+    title: "1. Apfel-Vanille Overnight Oats (Laktosefrei)",
+    short: "Apfel-Vanille Overnight Oats (~435 kcal | 39 g EW)",
+    kcal: "~435 kcal",
+    macros: "39 g Eiweiß · optional laktosefrei",
+    prepTime: "Vorabend (3 Min.)",
+    desc: "Fruchtig-zimtige Basisvariante – schnell im Schraubglas angerührt.",
+    ingredients: [
+      "45 g zarte Haferflocken",
+      "35 g Vanille-Whey-Pulver",
+      "180 ml Milch (1,5 % Fett, laktosefrei oder Pflanzendrink)",
+      "½ mittelgroßer Apfel (~80 g, grob mit Schale gerieben)",
+      "1 TL (5 g) Chiasamen oder geschrotete Leinsamen",
+      "½ TL Zimt"
+    ],
+    steps: [
+      "Zuerst Milch und Vanille-Whey im Schraubglas klümpchenfrei glatt rühren.",
+      "Haferflocken, Zimt und Chiasamen einrühren.",
+      "Apfel samt Schale hineinreiben und unterheben.",
+      "Verschlossen über Nacht (mind. 4 Std.) in den Kühlschrank stellen."
+    ]
+  },
+  {
+    id: "berry_oats",
+    label: "🫐 Overnight Oats „Berry Power“ (450 kcal | 38g EW)",
+    title: "2. Protein-Overnight-Oats „Berry Power“ (Laktosefrei)",
+    short: "Overnight Oats „Berry Power“ (~450 kcal | 38 g EW)",
+    kcal: "~450 kcal",
+    macros: "38 g EW · 45 g KH · 10 g Fett",
+    prepTime: "Vorabend (2 Min.)",
+    desc: "Der Klassiker, neu optimiert für maximale Sättigung und Muskelregeneration.",
+    ingredients: [
+      "50 g zarte Haferflocken",
+      "35 g Vanille- oder Beeren-Whey-Protein (alternativ veganes Erbsen-Reis-Protein)",
+      "200 ml Milch (laktosefrei oder ungesüßte Mandel-/Sojamilch)",
+      "100 g Tiefkühl-Beeren (Himbeeren oder Blaubeeren – gefroren dazugeben, tauen über Nacht auf)",
+      "1 EL (10 g) Chiasamen oder geschrotete Leinsamen",
+      "1 EL Magerquark (für Cremigkeit und zusätzliches Casein-Eiweiß)"
+    ],
+    steps: [
+      "Milch, Whey und Magerquark in einem Schraubglas (Mason Jar) glatt rühren.",
+      "Haferflocken, Chiasamen und die gefrorenen Beeren dazugeben, kurz umrühren.",
+      "Deckel drauf und ab in den Kühlschrank – morgens direkt löffelfertig!"
+    ]
+  },
+  {
+    id: "frittata_cup",
+    label: "🍳 Herzhafte To-Go Frittata (380 kcal | 32g EW)",
+    title: "3. Pikantes herzhaftes Omelett-Glas („To-Go Frittata“)",
+    short: "Herzhafte To-Go Frittata (~380 kcal | 32 g EW)",
+    kcal: "~380 kcal",
+    macros: "32 g EW · 18 g KH · 18 g Fett",
+    prepTime: "Vorabend (5 Min. + Ofen)",
+    desc: "Wenn du morgens lieber etwas Herzhaftes statt Süßes brauchst.",
+    ingredients: [
+      "3 Eier (Größe M oder L)",
+      "50 g Hüttenkäse (Cottage Cheese) oder Feta (zerbröselt)",
+      "Eine Handvoll Spinat (frisch) oder klein gewürfelte Paprika/Tomaten",
+      "30 g Haferflocken oder 1 kleine Scheibe Vollkornbrot (als Croutons eingebacken)",
+      "Salz, Pfeffer, Kräuter der Provence, etwas Paprikapulver"
+    ],
+    steps: [
+      "Eier in einer Schüssel verquirlen, Hüttenkäse, Gewürze und das Gemüse unterrühren.",
+      "Eine kleine ofenfeste Form oder Muffinförmchen leicht einfetten, Masse hineinfüllen.",
+      "Bei 180 °C Ober-/Unterhitze ca. 20 Minuten im Ofen stocken lassen.",
+      "Abkühlen lassen, abdecken und im Kühlschrank lagern. Morgens kalt genießen oder kurz in der Mikrowelle anwärmen."
+    ]
+  },
+  {
+    id: "choc_pb_chia",
+    label: "🍫 Schoko-Erdnuss-Chia-Pudding (440 kcal | 30g EW)",
+    title: "4. Schoko-Erdnuss-Chia-Pro-Pudding",
+    short: "Schoko-Erdnuss-Chia-Pudding (~440 kcal | 30 g EW)",
+    kcal: "~440 kcal",
+    macros: "30 g EW · 20 g KH · 24 g Fett",
+    prepTime: "Vorabend (3 Min.)",
+    desc: "Schmeckt wie Dessert, liefert aber lang anhaltende Energie und hochwertiges Eiweiß.",
+    ingredients: [
+      "40 g Chiasamen",
+      "30 g Schokoladen-Whey oder Schoko-Proteinpulver",
+      "220 ml Milch (laktosefrei oder Hafermilch)",
+      "1 gehäufter EL (15 g) Erdnussbutter (100 % Erdnüsse, ohne Zuckerzusatz)",
+      "1 TL Kakao (ungesüßt) für den Tiefgang"
+    ],
+    steps: [
+      "Proteinpulver, Kakao und Milch in einem Shaker oder Glas kräftig schütteln/rühren, bis keine Klümpchen da sind.",
+      "Chiasamen und die Erdnussbutter einrühren (die Erdnussbutter darf ruhig in kleinen Stücken drin bleiben).",
+      "Nach 10 Minuten im Kühlschrank noch einmal kurz umrühren (damit die Chiasamen nicht verklumpen) und über Nacht quellen lassen."
+    ]
+  },
+  {
+    id: "diet_shake",
+    label: "🥤 Diät- / Mahlzeitenersatz-Shake (~400 kcal | 30-35g EW)",
+    title: "5. Schneller Diät- / Mahlzeitenersatz-Shake (Ausweich-Option)",
+    short: "Diät- / Mahlzeitenersatz-Shake (~380–420 kcal | ~30–35 g EW)",
+    kcal: "~400 kcal",
+    macros: "30–35 g EW · schnelle Lösung",
+    prepTime: "Sofort (1 Min.)",
+    desc: "Unkomplizierte Notfall- & Ausweich-Alternative, wenn am Vorabend keine Zeit zum Vorbereiten blieb.",
+    ingredients: [
+      "1 Portion (ca. 45–55 g Pulver) generischer Diät- / Mahlzeitenersatz-Shake (oder 40 g Whey + 25 g feine Instant-Haferflocken)",
+      "250–300 ml Milch (1,5 % Fett, laktosefrei oder Pflanzendrink) oder ungesüßter Pflanzendrink",
+      "Optional: ½ TL Zimt, 1 TL geschrotete Leinsamen oder 1 Espresso-Shot für mehr Sättigung & Geschmack"
+    ],
+    steps: [
+      "Zuerst die gekühlte Milch (oder Wasser/Pflanzendrink) in den Shaker füllen.",
+      "Shake-Pulver und optionale Extras dazugeben, Deckel fest verschließen.",
+      "20–30 Sekunden kräftig schütteln, kurz 1 Minute ruhen lassen und direkt trinken."
+    ]
+  }
+];
+
+function populateMealDropdowns() {
+  document.querySelectorAll("[data-prep-meal]").forEach(sel => {
+    sel.innerHTML = "";
+    sel.appendChild(el("option", { value: "", txt: "+ Meal-Prep / Shake wählen…" }));
+    RECIPES.forEach(r => {
+      sel.appendChild(el("option", { value: r.id, txt: r.label }));
+    });
+  });
+}
+
+document.querySelectorAll("[data-prep-meal]").forEach(sel => {
+  sel.addEventListener("change", () => {
+    const rid = sel.value;
+    if (!rid) return;
+    const rec = RECIPES.find(x => x.id === rid);
+    const mealKey = sel.getAttribute("data-prep-meal");
+    if (rec && mealKey) {
+      applyRecipeToMeal(mealKey, rec.short);
+    }
+    sel.value = "";
+  });
+});
+
+function clearMealField(mealKey) {
+  const l = getFood(fDate);
+  l[mealKey] = "";
+  save();
+  flashFood();
+  renderFoodDay();
+  renderCal();
+  toast("Eintrag gelöscht.");
+}
+
+document.querySelectorAll("[data-del-meal]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    clearMealField(btn.getAttribute("data-del-meal"));
+  });
+});
+
+$("clearDayMeals").addEventListener("click", () => {
+  state.foodLogs[fDate] = { replacedMeal: false, noSnacking: false, breakfast: "", lunch: "", dinner: "", snacks: "" };
+  save();
+  flashFood();
+  renderFoodDay();
+  renderCal();
+  toast("Alle Mahlzeiten für " + deDate(fDate) + " geleert.");
+});
+
+function recipeAsText(r) {
+  return [
+    r.title + " (" + r.kcal + " | " + r.macros + ")",
+    "",
+    "Zutaten:",
+    ...r.ingredients.map(i => "- " + i),
+    "",
+    "Vorbereitung:",
+    ...r.steps.map((s, idx) => (idx + 1) + ". " + s)
+  ].join("\n");
+}
+
+function applyRecipeToMeal(mealKey, shortText) {
+  const l = getFood(fDate);
+  l[mealKey] = shortText;
+  l.replacedMeal = true;
+  save(); flashFood(); renderFoodDay(); renderCal();
+  toast("In Planer übernommen & Fokus-Haken gesetzt!");
+}
+
+function renderRecipes() {
+  const box = $("recipeList");
+  if (!box) return;
+  box.innerHTML = "";
+  RECIPES.forEach((r, idx) => {
+    const det = el("details", { cls: "rec" });
+    if (idx === 0) det.open = true;
+
+    const sum = el("summary", null, [
+      el("span", { txt: r.title }),
+      el("span", { style: "color:var(--mut);font-size:11px;flex-shrink:0", txt: r.kcal + " ▼" })
+    ]);
+
+    const meta = el("div", { cls: "rec-meta" }, [
+      el("span", { cls: "badge b-amb", txt: r.kcal }),
+      el("span", { cls: "badge b-grn", txt: r.macros }),
+      el("span", { cls: "badge b-blue", txt: r.prepTime })
+    ]);
+
+    const ingList = el("ul", null, r.ingredients.map(item => el("li", { txt: item })));
+    const stepList = el("ol", null, r.steps.map(st => el("li", { txt: st })));
+
+    const btnBf = el("button", { type: "button", cls: "btn btn-sm btn-blue", txt: "+ Ins Frühstück" });
+    btnBf.addEventListener("click", () => applyRecipeToMeal("breakfast", r.short));
+
+    const btnLu = el("button", { type: "button", cls: "btn btn-sm", txt: "+ Ins Mittagessen" });
+    btnLu.addEventListener("click", () => applyRecipeToMeal("lunch", r.short));
+
+    const btnCp = el("button", { type: "button", cls: "btn btn-sm full", style: "margin-top:6px", txt: "📋 Rezept-Text kopieren" });
+    btnCp.addEventListener("click", () => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(recipeAsText(r))
+          .then(() => toast("Rezept-Text kopiert!"))
+          .catch(() => toast("Kopieren nicht möglich."));
+      } else {
+        toast("Zwischenablage nicht verfügbar.");
+      }
+    });
+
+    const body = el("div", { cls: "rec-body" }, [
+      el("p", { cls: "sub", style: "margin-bottom:6px", txt: r.desc }),
+      meta,
+      el("strong", { txt: "Zutaten:" }),
+      ingList,
+      el("strong", { txt: "Zubereitung:" }),
+      stepList,
+      el("div", { cls: "g2", style: "margin-top:8px" }, [btnBf, btnLu]),
+      btnCp
+    ]);
+
+    det.appendChild(sum);
+    det.appendChild(body);
+    box.appendChild(det);
+  });
+}
+
+document.querySelectorAll("[data-bs]").forEach(b => b.addEventListener("click", () => {
+  const s = b.getAttribute("data-bs");
+  $("subFoodBtn").classList.toggle("active", s === "food");
+  $("subMetBtn").classList.toggle("active", s === "metrics");
+  $("subFood").style.display = s === "food" ? "flex" : "none";
+  $("subMet").style.display = s === "metrics" ? "flex" : "none";
+  if (s === "metrics") renderBody();
+}));
+function getFood(iso) {
+  if (!state.foodLogs[iso]) state.foodLogs[iso] = { replacedMeal: false, noSnacking: false, breakfast: "", lunch: "", dinner: "", snacks: "" };
+  return state.foodLogs[iso];
+}
+function foodStat(iso) {
+  const l = state.foodLogs[iso];
+  if (!l) return "";
+  if (l.replacedMeal && l.noSnacking) return "grn";
+  if ((l.breakfast && l.breakfast.trim()) || (l.lunch && l.lunch.trim()) || (l.dinner && l.dinner.trim()) || (l.snacks && l.snacks.trim()) || l.replacedMeal || l.noSnacking) return "amb";
+  return "";
+}
+function renderCal() {
+  const mn = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+  $("calTitle").textContent = mn[calM] + " " + calY;
+  const first = new Date(calY, calM, 1), days = new Date(calY, calM + 1, 0).getDate(), off = (first.getDay() + 6) % 7, tod = isoDate();
+  const g = $("calGrid"); g.innerHTML = "";
+  for (let i = 0; i < off; i++) g.appendChild(el("div", { cls: "cell empty" }));
+  for (let d = 1; d <= days; d++) {
+    const iso = calY + "-" + String(calM + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+    const st = foodStat(iso);
+    const c = el("button", { type: "button", cls: "cell" + (st ? " " + st : "") + (iso === fDate ? " sel" : "") + (iso === tod ? " tod" : ""), txt: String(d) });
+    c.addEventListener("click", () => { fDate = iso; renderCal(); renderFoodDay(); });
+    g.appendChild(c);
+  }
+}
+function renderFoodDay() {
+  const tod = isoDate(), tmr = addDays(tod, 1);
+  $("foodHead").textContent = fDate === tod ? "Heute, " + deDate(fDate) : (fDate === tmr ? "Morgen (Vorplanung), " + deDate(fDate) : (fDate > tod ? "Vorplanung, " + deDate(fDate) : "Rückblick, " + deDate(fDate)));
+  const l = getFood(fDate);
+  $("fdRep").checked = !!l.replacedMeal; $("fdSnk").checked = !!l.noSnacking;
+  $("fdRow1").classList.toggle("on", !!l.replacedMeal); $("fdRow2").classList.toggle("on", !!l.noSnacking);
+  $("fdB").value = l.breakfast || ""; $("fdL").value = l.lunch || ""; $("fdD").value = l.dinner || ""; $("fdS").value = l.snacks || "";
+  updateDailyOverview();
+}
+function flashFood() { $("foodSav").textContent = "Gespeichert ✓"; setTimeout(() => { $("foodSav").textContent = "Speichert automatisch"; }, 1000); }
+
+$("calPrev").addEventListener("click", () => { calM--; if (calM < 0) { calM = 11; calY--; } renderCal(); });
+$("calNext").addEventListener("click", () => { calM++; if (calM > 11) { calM = 0; calY++; } renderCal(); });
+$("calToday").addEventListener("click", () => { const n = new Date(); fDate = isoDate(n); calY = n.getFullYear(); calM = n.getMonth(); renderCal(); renderFoodDay(); });
+$("calTmrw").addEventListener("click", () => { const t = addDays(isoDate(), 1), p = t.split("-").map(Number); fDate = t; calY = p[0]; calM = p[1] - 1; renderCal(); renderFoodDay(); });
+$("fdRep").addEventListener("change", e => { getFood(fDate).replacedMeal = e.target.checked; save(); flashFood(); renderFoodDay(); renderCal(); });
+$("fdSnk").addEventListener("change", e => { getFood(fDate).noSnacking = e.target.checked; save(); flashFood(); renderFoodDay(); renderCal(); });
+[["fdB", "breakfast"], ["fdL", "lunch"], ["fdD", "dinner"], ["fdS", "snacks"]].forEach(p => {
+  $(p[0]).addEventListener("input", e => { getFood(fDate)[p[1]] = e.target.value; save(); flashFood(); renderCal(); updateDailyOverview(); });
+});
+
+document.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", () => {
+  bMetric = b.getAttribute("data-bm");
+  document.querySelectorAll("[data-bm]").forEach(x => x.classList.toggle("active", x.getAttribute("data-bm") === bMetric));
+  renderBody();
+}));
+function renderBody() {
+  const sorted = state.bodyLogs.slice().sort((a, b) => a.date.localeCompare(b.date));
+  const pts = sorted.filter(x => typeof x[bMetric] === "number" && !isNaN(x[bMetric]));
+  const cols = { weight: "#38bdf8", muscle: "#10b981", water: "#a78bfa", fat: "#f59e0b" };
+  if (!pts.length) {
+    $("bdChart").innerHTML = '<div style="text-align:center;padding:20px;color:var(--mut);font-size:12px">Noch keine Daten vorhanden.</div>';
+  } else {
+    const sl = pts.slice(-14), W = 320, H = 130, pL = 34, pR = 14, pT = 14, pB = 20, pW = W - pL - pR, pH = H - pT - pB;
+    const vs = sl.map(x => x[bMetric]), mn = Math.min(...vs), mx = Math.max(...vs), sp = mx - mn || 1;
+    const y0 = mn - sp * 0.15, y1 = mx + sp * 0.15;
+    const gx = i => sl.length === 1 ? pL + pW / 2 : pL + (i / (sl.length - 1)) * pW;
+    const gy = v => pT + pH - ((v - y0) / (y1 - y0)) * pH;
+    const poly = sl.map((d, i) => gx(i).toFixed(1) + "," + gy(d[bMetric]).toFixed(1)).join(" ");
+    const dots = sl.map((d, i) => '<circle cx="' + gx(i).toFixed(1) + '" cy="' + gy(d[bMetric]).toFixed(1) + '" r="3.5" fill="' + cols[bMetric] + '"/>').join("");
+    $("bdChart").innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block"><text x="2" y="' + (pT + 4) + '" fill="#94a3b8" font-size="9">' + mx.toFixed(1) + '</text><text x="2" y="' + (H - pB) + '" fill="#94a3b8" font-size="9">' + mn.toFixed(1) + '</text><polyline fill="none" stroke="' + cols[bMetric] + '" stroke-width="2.4" points="' + poly + '"/>' + dots + '<text x="' + pL + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9">' + deDate(sl[0].date).slice(0, 5) + '</text><text x="' + (W - pR) + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9" text-anchor="end">' + deDate(sl[sl.length - 1].date).slice(0, 5) + '</text></svg>';
+  }
+  const box = $("bdTbl"); box.innerHTML = "";
+  if (!sorted.length) { box.appendChild(el("p", { cls: "sub", txt: "Noch keine Körper-Messwerte erfasst." })); return; }
+  const rows = sorted.map((it, i) => {
+    const pr = i > 0 ? sorted[i - 1] : null;
+    const dw = (pr && typeof it.weight === "number" && typeof pr.weight === "number") ? it.weight - pr.weight : null;
+    return Object.assign({}, it, { dw });
+  }).reverse();
+  const tbl = el("table");
+  tbl.appendChild(el("thead", null, el("tr", null, ["Datum", "Gewicht", "Diff", "Muskel", "Wasser", "Fett", ""].map(h => el("th", { txt: h })))));
+  const tb = el("tbody");
+  rows.forEach(r => {
+    const dCell = el("td");
+    if (r.dw !== null && !isNaN(r.dw)) dCell.appendChild(el("span", { cls: r.dw > 0 ? "pos" : (r.dw < 0 ? "neg" : ""), txt: (r.dw > 0 ? "+" : "") + r.dw.toFixed(1) }));
+    else dCell.textContent = "—";
+    const del = el("button", { type: "button", cls: "btn btn-sm btn-red", txt: "×" });
+    del.addEventListener("click", () => { state.bodyLogs = state.bodyLogs.filter(x => x.id !== r.id); save(); renderBody(); toast("Messwert gelöscht."); });
+    tb.appendChild(el("tr", null, [
+      el("td", { txt: deDate(r.date) }),
+      el("td", null, el("strong", { txt: r.weight != null ? r.weight.toFixed(1) : "—" })),
+      dCell,
+      el("td", { txt: r.muscle != null ? r.muscle.toFixed(1) : "—" }),
+      el("td", { txt: r.water != null ? r.water.toFixed(1) : "—" }),
+      el("td", { txt: r.fat != null ? r.fat.toFixed(1) : "—" }),
+      el("td", { style: "text-align:right" }, del)
+    ]));
+  });
+  tbl.appendChild(tb); box.appendChild(tbl);
+}
+$("bdSave").addEventListener("click", () => {
+  const num = id => { const v = $(id).value.trim(); return v === "" ? null : Number(v); };
+  const weight = num("bdW"), muscle = num("bdM"), water = num("bdWa"), fat = num("bdF");
+  if (weight === null && muscle === null && water === null && fat === null) { toast("Bitte mindestens einen Messwert eingeben."); return; }
+  state.bodyLogs.push({ id: Date.now(), date: $("bdDate").value || isoDate(), weight, muscle, water, fat, notes: $("bdN").value.trim() });
+  save(); ["bdW", "bdM", "bdWa", "bdF", "bdN"].forEach(id => { $(id).value = ""; }); renderBody(); toast("Körperwerte gespeichert!");
+});
+
+/* TAB 7: BACKUP */
+function renderBackup() {
+  const raw = localStorage.getItem(KEY) || "";
+  const dCnt = Object.keys(state.dailyWorkouts || {}).length;
+  const tCnt = (state.trainingLogs || []).length;
+  const bCnt = (state.bpLogs || []).length;
+  const fCnt = Object.keys(state.foodLogs || {}).filter(k => foodStat(k) !== "").length;
+  const boCnt = (state.bodyLogs || []).length;
+  const foCnt = Object.keys(state.cognitionLogs || {}).length + (state.mindDumps || []).length;
+  const totalItems = dCnt + tCnt + bCnt + fCnt + boCnt + foCnt;
+
+  $("stKb").textContent = (new Blob([raw]).size / 1024).toFixed(1) + " KB";
+  $("stLast").textContent = state.lastBackup ? new Date(state.lastBackup).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }) : "Noch kein Backup";
+  $("stD").textContent = String(dCnt);
+  $("stT").textContent = String(tCnt);
+  $("stB").textContent = String(bCnt);
+  $("stF").textContent = String(fCnt);
+  $("stBo").textContent = String(boCnt);
+  $("stFo").textContent = String(foCnt);
+
+  const warnBox = $("bakWarn");
+  const daysSince = state.lastBackup ? Math.floor((Date.now() - new Date(state.lastBackup).getTime()) / 86400000) : null;
+  if (!state.lastBackup && totalItems >= 5) {
+    warnBox.className = "alert-box warn";
+    warnBox.innerHTML = '<span>⚠️ <strong>Jahressicherung empfohlen:</strong> Du hast bereits ' + totalItems + ' Einträge erfasst, aber noch kein JSON-Backup exportiert.</span><span class="badge b-amb">Offen</span>';
+  } else if (daysSince !== null && daysSince >= 14) {
+    warnBox.className = "alert-box warn";
+    warnBox.innerHTML = '<span>⏳ <strong>Backup-Erinnerung:</strong> Dein letzter JSON-Export liegt ' + daysSince + ' Tage zurück. Sichere deinen aktuellen Stand lokal.</span><span class="badge b-amb">' + daysSince + 'd</span>';
+  } else if (state.lastBackup) {
+    warnBox.className = "alert-box ok";
+    warnBox.innerHTML = '<span>✓ <strong>Datensicherung aktuell:</strong> Letzter Export vor ' + (daysSince === 0 ? "weniger als 1 Tag" : daysSince + (daysSince === 1 ? " Tag" : " Tagen")) + '.</span><span class="badge b-grn">OK</span>';
+  } else {
+    warnBox.className = "alert-box";
+    warnBox.innerHTML = '<span>ℹ️ Alle Daten liegen offline in deinem Browser. Exportiere regelmäßig eine JSON-Sicherung für die langfristige Archivierung.</span>';
+  }
+}
+$("expBtn").addEventListener("click", () => {
+  state.lastBackup = new Date().toISOString(); save(); renderBackup();
+  const url = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], { type: "application/json" }));
+  const a = el("a", { href: url, download: "health-life-backup-" + isoDate() + ".json" });
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000); toast("JSON-Backup heruntergeladen.");
+});
+$("impInp").addEventListener("change", e => {
+  const file = e.target.files && e.target.files[0]; if (!file) return;
+  const rd = new FileReader();
+  rd.onload = ev => {
+    try {
+      const p = JSON.parse(String(ev.target.result));
+      if (!p || typeof p !== "object") throw 0;
+      const d = defState();
+      state = {
+        version: 1, lastBackup: p.lastBackup || new Date().toISOString(),
+        dailyWorkouts: p.dailyWorkouts && typeof p.dailyWorkouts === "object" ? p.dailyWorkouts : d.dailyWorkouts,
+        trainingLogs: Array.isArray(p.trainingLogs) ? p.trainingLogs : d.trainingLogs,
+        bpLogs: Array.isArray(p.bpLogs) ? p.bpLogs : d.bpLogs,
+        cognitionLogs: p.cognitionLogs && typeof p.cognitionLogs === "object" ? p.cognitionLogs : d.cognitionLogs,
+        mindDumps: Array.isArray(p.mindDumps) ? p.mindDumps : d.mindDumps,
+        bodyLogs: Array.isArray(p.bodyLogs) ? p.bodyLogs : d.bodyLogs,
+        customWeights: p.customWeights && typeof p.customWeights === "object" ? p.customWeights : d.customWeights,
+        mindDumpDraft: p.mindDumpDraft && typeof p.mindDumpDraft === "object" ? { q1: p.mindDumpDraft.q1 || "", q2: p.mindDumpDraft.q2 || "", q3: p.mindDumpDraft.q3 || "" } : d.mindDumpDraft,
+        foodLogs: p.foodLogs && typeof p.foodLogs === "object" ? p.foodLogs : {}
+      };
+      save(); initAll(); toast("Backup erfolgreich wiederhergestellt!");
+    } catch (err) { toast("Fehler: Ungültige JSON-Datei."); }
+    finally { e.target.value = ""; }
+  };
+  rd.readAsText(file);
+});
+
+/* INIT */
+function initAll() {
+  const tod = isoDate();
+  $("datePill").textContent = deDate(tod);
+  $("trDate").value = tod; $("bpDate").value = tod; $("bdDate").value = tod;
+  updateDailyStat(); updateDailyOverview(); renderActiveEx(); renderExList();
+  renderTrPlan(); renderTrHist();
+  syncBpTime(); renderBp();
+  focDate = tod; renderFocus();
+  renderDumps();
+  fDate = tod; calY = new Date().getFullYear(); calM = new Date().getMonth();
+  populateMealDropdowns(); renderRecipes(); renderCal(); renderFoodDay(); renderBody();
+  renderBackup();
+}
+initAll();
+})();
+</script>
+
+<!-- DISCLAIMER MODAL (bei jedem Start) -->
+<div id="discModal" class="modal-backdrop open" role="dialog" aria-modal="true" aria-labelledby="discTitle">
+  <div class="modal-box" style="border-color:rgba(245,158,11,.55)">
+    <div class="modal-hdr">
+      <h2 id="discTitle" style="color:#fbbf24">⚠️ Wichtiger Hinweis & Haftungsausschluss</h2>
+    </div>
+    <div class="modal-body">
+      <p><strong>Training auf eigene Gefahr:</strong> Alle Übungen, Timings und Trainingspläne in dieser App erfolgen vollständig auf eigene Verantwortung und Gefahr.</p>
+      <p><strong>Keine Gesundheitsberatung:</strong> Diese Anwendung dient ausschließlich der persönlichen Dokumentation und Selbstorganisation. Sie stellt <strong>keine medizinische, ärztliche, physiotherapeutische oder ernährungswissenschaftliche Beratung</strong> dar und ersetzt keine Untersuchung durch Fachpersonal.</p>
+      <p style="font-size:12px;color:var(--mut)">Bei Schmerzen, Schwindel, Vorerkrankungen oder auffälligen Blutdruckwerten brich das Training sofort ab und konsultiere einen Arzt.</p>
+      <button type="button" id="discAccept" class="btn btn-grn full" style="margin-top:6px">✓ Verstanden & auf eigene Gefahr starten</button>
+    </div>
+  </div>
+</div>
+
+<!-- ÜBER DIE APP MODAL -->
+<div id="aboutModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h2 id="aboutTitle">ℹ️ Über Health & Life Dashboard</h2>
+      <button type="button" id="aboutCloseX" class="btn btn-sm">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>100 % Offline & ohne Cloud:</strong> Ziel dieser App war es, einen übersichtlichen Gesundheits-, Trainings- und Alltagstracker zu schaffen, der komplett ohne Benutzerkonto, Cloud-Zwang oder Datenweitergabe auskommt. Alle Einträge bleiben lokal in deinem Browser (mit JSON-Backup).</p>
+      <p><strong>Gelenkschonender Ansatz:</strong> Die hinterlegten Übungen und Routinen basieren auf gelenkschonenden Bewegungsabläufen (z. B. kontrollierte Hüft- und Rumpfstabilität, moderate Winkel, Polsterung).</p>
+      <p><strong>Mit KI entwickelt – frei anpassbar (MIT-Lizenz):</strong> Diese Single-File-HTML-App wurde mithilfe von Künstlicher Intelligenz erstellt. Der Quellcode ist bewusst schlank und offen gehalten, damit ihn jeder frei nutzen, mit einer eigenen KI weiterentwickeln oder mit HTML/JS-Kenntnissen an seine eigenen Bedürfnisse anpassen kann.</p>
+      <p style="font-size:12px;color:var(--mut)">Hinweis: Kein Medizinprodukt · Nutzung und Training auf eigene Gefahr.</p>
+      <button type="button" id="aboutCloseBtn" class="btn btn-blue full" style="margin-top:4px">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const discModal = document.getElementById("discModal");
+  const aboutModal = document.getElementById("aboutModal");
+  document.getElementById("discAccept").addEventListener("click", () => {
+    discModal.classList.remove("open");
+  });
+  document.getElementById("aboutBtn").addEventListener("click", () => {
+    aboutModal.classList.add("open");
+  });
+  document.getElementById("aboutCloseX").addEventListener("click", () => {
+    aboutModal.classList.remove("open");
+  });
+  document.getElementById("aboutCloseBtn").addEventListener("click", () => {
+    aboutModal.classList.remove("open");
+  });
+  aboutModal.addEventListener("click", e => {
+    if (e.target === aboutModal) aboutModal.classList.remove("open");
+  });
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
