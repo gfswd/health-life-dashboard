@@ -2,16 +2,17 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Health & Life">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" type="image/svg+xml" href="./icon.svg">
-<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <title>Health & Life Dashboard</title>
 <style>
 :root{
+  color-scheme:dark;
   --bg:#0b1120;--hdr:#0f172a;--card:#151f32;--alt:#1b273e;--inp:#0d1525;
   --bdr:#26354f;--bdr2:#334668;--txt:#f1f5f9;--mut:#94a3b8;
   --blue:#38bdf8;--blueBg:rgba(56,189,248,.14);
@@ -23,16 +24,16 @@
   --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
 }
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;width:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--txt);font:14px/1.45 var(--sans);display:flex;flex-direction:column}
+html,body{margin:0;padding:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);color:var(--txt);font:14px/1.45 var(--sans);display:flex;flex-direction:column}
 header{flex:0 0 auto;background:var(--hdr);border-bottom:1px solid var(--bdr);padding-top:env(safe-area-inset-top,0px);z-index:20}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 6px}
 .hdr-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin:0}
 .logo{width:24px;height:24px;border-radius:6px;background:var(--blueBg);border:1px solid rgba(56,189,248,.35);display:flex;align-items:center;justify-content:center;color:var(--blue)}
-.pills{display:flex;gap:6px}
+.pills{display:flex;gap:6px;align-items:center}
 .pill{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--alt);color:var(--mut);border:1px solid var(--bdr);white-space:nowrap}
 .pill.on{background:var(--grnBg);color:#34d399;border-color:rgba(16,185,129,.45)}
 nav.tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:4px 4px 6px}
-.tab{appearance:none;border:1px solid transparent;background:transparent;color:var(--mut);border-radius:8px;padding:5px 1px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-width:0}
+.tab{appearance:none;border:1px solid transparent;background:transparent;color:var(--mut);border-radius:8px;padding:6px 2px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;min-width:0}
 .tab svg{width:15px;height:15px;stroke-width:2.1}
 .tab span{font-size:9.5px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;max-width:100%}
 @media(min-width:400px){.tab span{font-size:10.5px}.tab svg{width:16px;height:16px}}
@@ -46,30 +47,31 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .sub{font-size:12px;color:var(--mut);margin:2px 0 0}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:3px;gap:4px}
 .seg.c4{grid-template-columns:repeat(4,1fr)}
-.seg button{appearance:none;border:none;background:transparent;color:var(--mut);font:600 12.5px var(--sans);padding:8px 6px;border-radius:9px;cursor:pointer}
+.seg button{appearance:none;border:none;background:transparent;color:var(--mut);font:600 12.5px var(--sans);padding:8px 6px;min-height:36px;border-radius:9px;cursor:pointer}
 .seg button.active{background:var(--blue);color:#082f49;font-weight:700}
-.btn{appearance:none;border:1px solid var(--bdr2);background:var(--alt);color:var(--txt);font:600 13px var(--sans);padding:10px 14px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn{appearance:none;border:1px solid var(--bdr2);background:var(--alt);color:var(--txt);font:600 13px var(--sans);padding:10px 14px;min-height:42px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:active{transform:scale(.98)}
 .btn-blue{background:var(--blue);border-color:var(--blue);color:#082f49;font-weight:700}
 .btn-grn{background:var(--grn);border-color:var(--grn);color:#022c22;font-weight:700}
 .btn-red{background:var(--redBg);border-color:rgba(244,63,94,.45);color:#fda4af}
-.btn-sm{padding:5px 9px;font-size:11.5px;border-radius:8px}
+.btn-sm{padding:6px 10px;min-height:34px;font-size:12px;border-radius:8px}
+.btn-del-row{min-width:34px;min-height:34px;padding:4px 8px}
 .full{width:100%}
 label.lbl{display:block;font-size:11.5px;font-weight:600;color:var(--mut);margin-bottom:4px}
-input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:var(--inp);border:1px solid var(--bdr);color:var(--txt);font:14px var(--sans);padding:9px 10px;border-radius:8px;outline:none}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:var(--inp);border:1px solid var(--bdr);color:var(--txt);font:16px var(--sans);padding:9px 10px;border-radius:8px;outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 textarea{resize:vertical;min-height:68px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .chk-row{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;cursor:pointer;user-select:none}
 .chk-row.on{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.08)}
-.chk-row input{width:19px;height:19px;margin:1px 0 0;accent-color:var(--grn);flex-shrink:0}
+.chk-row input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--grn);flex-shrink:0}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
 .b-grn{background:var(--grnBg);color:#34d399}.b-amb{background:var(--ambBg);color:#fbbf24}.b-red{background:var(--redBg);color:#fb7185}.b-blue{background:var(--blueBg);color:#7dd3fc}
 
 /* Status-Banner & Hinweise */
 .status-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:10px}
-.st-chip{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--inp);border:1px solid var(--bdr);border-radius:10px;padding:7px 9px;cursor:pointer;text-align:left}
+.st-chip{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--inp);border:1px solid var(--bdr);border-radius:10px;padding:8px 9px;min-height:48px;cursor:pointer;text-align:left}
 .st-chip:active{transform:scale(.99)}
 .st-chip.ok{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.08)}
 .st-chip.part{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.08)}
@@ -93,7 +95,7 @@ textarea{resize:vertical;min-height:68px}
 .item.cur{border-color:var(--grn);background:rgba(16,185,129,.07)}
 .item.nxt{border-color:var(--blue);background:rgba(56,189,248,.07)}
 .item.dim{opacity:.55}
-.item-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer}
+.item-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;min-height:36px}
 .drawer{margin-top:10px;padding-top:10px;border-top:1px dashed var(--bdr2);display:none}
 .drawer.open{display:block}
 .t-inps{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--bdr)}
@@ -107,7 +109,7 @@ textarea{resize:vertical;min-height:68px}
 
 /* 7-Tage Fokus */
 .d7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.d7-c{background:var(--inp);border:1px solid var(--bdr);border-radius:8px;padding:6px 2px;text-align:center;cursor:pointer}
+.d7-c{background:var(--inp);border:1px solid var(--bdr);border-radius:8px;padding:6px 2px;min-height:50px;text-align:center;cursor:pointer}
 .d7-c.sel{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
 .dots{display:flex;justify-content:center;gap:2px;margin-top:3px}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--bdr2)}
@@ -131,11 +133,11 @@ textarea{resize:vertical;min-height:68px}
 .meal-box{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:9px 10px}
 .meal-top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 .meal-tools{display:flex;align-items:center;gap:5px;flex:1;justify-content:flex-end;min-width:190px}
-.prep-sel{background:var(--ambBg);border:1px solid rgba(245,158,11,.45);color:#fcd34d;font:700 11px var(--sans);padding:4px 6px;border-radius:7px;max-width:185px;width:auto;cursor:pointer}
+.prep-sel{background:var(--ambBg);border:1px solid rgba(245,158,11,.45);color:#fcd34d;font:600 16px/1.2 var(--sans);padding:5px 8px;border-radius:7px;max-width:225px;width:auto;cursor:pointer}
 .prep-sel option{background:var(--hdr);color:var(--txt);font-weight:600}
 .meal-inp-row{display:flex;align-items:center;gap:6px}
 .meal-inp-row input{flex:1;min-width:0}
-.del-meal{appearance:none;background:var(--redBg);border:1px solid rgba(244,63,94,.4);color:#fda4af;font:700 13px var(--sans);width:34px;height:36px;border-radius:8px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.del-meal{appearance:none;background:var(--redBg);border:1px solid rgba(244,63,94,.4);color:#fda4af;font:700 14px var(--sans);width:38px;height:40px;border-radius:8px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
 .del-meal:active{transform:scale(.95)}
 .rec-sec{margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:8px}
 .rec-sec-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
@@ -153,7 +155,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}
 th{text-align:left;color:var(--mut);font-weight:600;padding:6px 4px;border-bottom:1px solid var(--bdr)}
 td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
 .pos{color:#fbbf24;font-weight:600}.neg{color:#34d399;font-weight:600}
-.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#f8fafc;border:1px solid var(--blue);padding:9px 16px;border-radius:999px;font-size:12.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.45);z-index:99;opacity:0;pointer-events:none;transition:all .2s ease;white-space:nowrap}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#f8fafc;border:1px solid var(--blue);padding:9px 16px;border-radius:999px;font-size:12.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.45);z-index:250;opacity:0;pointer-events:none;transition:all .2s ease;max-width:92vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* Modals (Disclaimer & Über die App) */
@@ -164,7 +166,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
 .modal-hdr h2{font-size:16px;font-weight:800;margin:0}
 .modal-body{font-size:13px;line-height:1.5;color:var(--txt);display:flex;flex-direction:column;gap:10px}
 .modal-body p{margin:0}
-.info-btn{appearance:none;background:var(--blueBg);border:1px solid rgba(56,189,248,.4);color:var(--blue);font:700 11px var(--sans);padding:3px 9px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.info-btn{appearance:none;background:var(--blueBg);border:1px solid rgba(56,189,248,.4);color:var(--blue);font:700 11px var(--sans);padding:4px 10px;min-height:28px;border-radius:999px;cursor:pointer;white-space:nowrap}
 .info-btn:active{transform:scale(.96)}
 </style>
 </head>
@@ -183,20 +185,20 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
     </div>
   </div>
   <nav class="tabs" role="tablist">
-    <button type="button" class="tab active" data-t="p-daily"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/></svg><span>Täglich</span></button>
-    <button type="button" class="tab" data-t="p-train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6.5 6.5 11 11"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg><span>Training</span></button>
-    <button type="button" class="tab" data-t="p-bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>Blutdruck</span></button>
-    <button type="button" class="tab" data-t="p-focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>Fokus</span></button>
-    <button type="button" class="tab" data-t="p-rest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><span>Ruhe</span></button>
-    <button type="button" class="tab" data-t="p-body"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg><span>Körper</span></button>
-    <button type="button" class="tab" data-t="p-bak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg><span>Backup</span></button>
+    <button type="button" class="tab active" role="tab" aria-selected="true" aria-controls="p-daily" data-t="p-daily"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M10 2h4"/></svg><span>Täglich</span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="p-train" data-t="p-train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6.5 6.5 11 11"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg><span>Training</span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="p-bp" data-t="p-bp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>Blutdruck</span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="p-focus" data-t="p-focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span>Fokus</span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="p-rest" data-t="p-rest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><span>Ruhe</span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="p-body" data-t="p-body"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg><span>Körper</span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="p-bak" data-t="p-bak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg><span>Backup</span></button>
   </nav>
 </header>
 
 <main id="mainBox">
 
   <!-- TAB 1: TÄGLICH -->
-  <section id="p-daily" class="panel active">
+  <section id="p-daily" class="panel active" role="tabpanel">
     <div class="status-strip" aria-label="Tages-Status-Indikator">
       <button type="button" class="st-chip" id="stFoodChip">
         <div>
@@ -247,7 +249,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
   </section>
 
   <!-- TAB 2: TRAINING -->
-  <section id="p-train" class="panel">
+  <section id="p-train" class="panel" role="tabpanel">
     <div class="card">
       <div class="card-hdr"><div><h2>Kraft- & Ausdauer-Logbuch</h2><p class="sub">Gelenkschonende Ausführung · Merkt sich deine Werte</p></div></div>
       <div class="seg" style="margin-bottom:12px">
@@ -266,7 +268,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
   </section>
 
   <!-- TAB 3: BLUTDRUCK -->
-  <section id="p-bp" class="panel">
+  <section id="p-bp" class="panel" role="tabpanel">
     <div class="card">
       <div class="card-hdr"><div><h2>Blutdruck & Puls</h2><p class="sub">5 Min. ruhig sitzen vor der Messung</p></div></div>
       <div class="g2" style="margin-bottom:10px">
@@ -293,7 +295,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
   </section>
 
   <!-- TAB 4: FOKUS -->
-  <section id="p-focus" class="panel">
+  <section id="p-focus" class="panel" role="tabpanel">
     <div class="card">
       <div class="card-hdr">
         <div><h2>Kognition & Alltagsschutz</h2><p class="sub" id="focLbl">Heute</p></div>
@@ -316,7 +318,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
   </section>
 
   <!-- TAB 5: RUHE -->
-  <section id="p-rest" class="panel">
+  <section id="p-rest" class="panel" role="tabpanel">
     <div class="card">
       <div class="card-hdr">
         <div><h2>Box Breathing (4-4-4-4)</h2><p class="sub" id="brRounds">Abgeschlossene Runden: 0</p></div>
@@ -343,7 +345,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
   </section>
 
   <!-- TAB 6: KÖRPER & ERNÄHRUNG -->
-  <section id="p-body" class="panel">
+  <section id="p-body" class="panel" role="tabpanel">
     <div class="seg">
       <button type="button" class="active" id="subFoodBtn" data-bs="food">🍽️ Essen & Kalender</button>
       <button type="button" id="subMetBtn" data-bs="metrics">⚖️ Körper & Messwerte</button>
@@ -389,7 +391,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
             </div>
             <div class="meal-inp-row">
               <input type="text" id="fdB" placeholder="Geplant oder gegessen (frei editierbar)...">
-              <button type="button" class="del-meal" data-del-meal="breakfast" title="Frühstück löschen">✕</button>
+              <button type="button" class="del-meal" data-del-meal="breakfast" title="Frühstück löschen" aria-label="Frühstück löschen">✕</button>
             </div>
           </div>
 
@@ -402,7 +404,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
             </div>
             <div class="meal-inp-row">
               <input type="text" id="fdL" placeholder="Geplant oder gegessen (frei editierbar)...">
-              <button type="button" class="del-meal" data-del-meal="lunch" title="Mittagessen löschen">✕</button>
+              <button type="button" class="del-meal" data-del-meal="lunch" title="Mittagessen löschen" aria-label="Mittagessen löschen">✕</button>
             </div>
           </div>
 
@@ -415,7 +417,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
             </div>
             <div class="meal-inp-row">
               <input type="text" id="fdD" placeholder="Geplant oder gegessen (frei editierbar)...">
-              <button type="button" class="del-meal" data-del-meal="dinner" title="Abendessen löschen">✕</button>
+              <button type="button" class="del-meal" data-del-meal="dinner" title="Abendessen löschen" aria-label="Abendessen löschen">✕</button>
             </div>
           </div>
 
@@ -425,7 +427,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
             </div>
             <div class="meal-inp-row">
               <input type="text" id="fdS" placeholder="z. B. 2,5 L Wasser, Kaffee schwarz...">
-              <button type="button" class="del-meal" data-del-meal="snacks" title="Snacks / Notiz löschen">✕</button>
+              <button type="button" class="del-meal" data-del-meal="snacks" title="Snacks / Notiz löschen" aria-label="Snacks oder Notiz löschen">✕</button>
             </div>
           </div>
         </div>
@@ -473,7 +475,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
   </section>
 
   <!-- TAB 7: BACKUP -->
-  <section id="p-bak" class="panel">
+  <section id="p-bak" class="panel" role="tabpanel">
     <div class="card">
       <div class="card-hdr"><div><h2>System & Datensicherung</h2><p class="sub">Lokaler Speicher: <code>health_life_dashboard_v1</code></p></div></div>
       <div id="bakWarn" class="alert-box" style="margin-bottom:12px"></div>
@@ -512,7 +514,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
   <svg data-k="sldl" viewBox="0 0 220 110" fill="none"><circle cx="148" cy="46" r="8" stroke="#f1f5f9" stroke-width="2.5"/><line x1="60" y1="48" x2="140" y2="48" stroke="#f1f5f9" stroke-width="3.5" stroke-linecap="round"/><line x1="104" y1="48" x2="104" y2="102" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/><line x1="132" y1="48" x2="132" y2="82" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/><line x1="86" y1="102" x2="122" y2="102" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>
 </template>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
@@ -520,6 +522,14 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
 const KEY = "health_life_dashboard_v1";
 const $ = id => document.getElementById(id);
 const svgTpl = $("svg-defs").content;
+
+function isPlainObj(v) {
+  return !!v && typeof v === "object" && !Array.isArray(v);
+}
+
+function escSvg(s) {
+  return String(s || "").replace(/[&<>"']/g, c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
+}
 
 function getSvg(k) {
   const n = svgTpl.querySelector('[data-k="' + k + '"]');
@@ -539,8 +549,9 @@ function addDays(iso, n) {
 }
 
 function deDate(iso) {
-  if (!iso || iso.indexOf("-") < 0) return iso || "";
-  const p = iso.split("-");
+  if (!iso || String(iso).indexOf("-") < 0) return String(iso || "");
+  const p = String(iso).split("-");
+  if (p.length < 3) return String(iso);
   return p[2] + "." + p[1] + "." + p[0];
 }
 
@@ -552,42 +563,57 @@ function defState() {
   };
 }
 
+function normalizeState(p, fallbackLastBackup) {
+  const d = defState();
+  return {
+    version: 1,
+    lastBackup: p.lastBackup || fallbackLastBackup || null,
+    dailyWorkouts: isPlainObj(p.dailyWorkouts) ? p.dailyWorkouts : d.dailyWorkouts,
+    trainingLogs: Array.isArray(p.trainingLogs) ? p.trainingLogs : d.trainingLogs,
+    bpLogs: Array.isArray(p.bpLogs) ? p.bpLogs : d.bpLogs,
+    cognitionLogs: isPlainObj(p.cognitionLogs) ? p.cognitionLogs : d.cognitionLogs,
+    mindDumps: Array.isArray(p.mindDumps) ? p.mindDumps : d.mindDumps,
+    bodyLogs: Array.isArray(p.bodyLogs) ? p.bodyLogs : d.bodyLogs,
+    customWeights: isPlainObj(p.customWeights) ? p.customWeights : d.customWeights,
+    mindDumpDraft: isPlainObj(p.mindDumpDraft)
+      ? { q1: p.mindDumpDraft.q1 || "", q2: p.mindDumpDraft.q2 || "", q3: p.mindDumpDraft.q3 || "" }
+      : d.mindDumpDraft,
+    foodLogs: isPlainObj(p.foodLogs) ? p.foodLogs : d.foodLogs
+  };
+}
+
+let corruptStorageDetected = false;
 let state = (function() {
   const d = defState();
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return d;
     const p = JSON.parse(raw);
-    if (!p || typeof p !== "object") return d;
-    return {
-      version: 1,
-      lastBackup: p.lastBackup || null,
-      dailyWorkouts: p.dailyWorkouts && typeof p.dailyWorkouts === "object" ? p.dailyWorkouts : {},
-      trainingLogs: Array.isArray(p.trainingLogs) ? p.trainingLogs : [],
-      bpLogs: Array.isArray(p.bpLogs) ? p.bpLogs : [],
-      cognitionLogs: p.cognitionLogs && typeof p.cognitionLogs === "object" ? p.cognitionLogs : {},
-      mindDumps: Array.isArray(p.mindDumps) ? p.mindDumps : [],
-      bodyLogs: Array.isArray(p.bodyLogs) ? p.bodyLogs : [],
-      customWeights: p.customWeights && typeof p.customWeights === "object" ? p.customWeights : {},
-      mindDumpDraft: p.mindDumpDraft && typeof p.mindDumpDraft === "object"
-        ? { q1: p.mindDumpDraft.q1 || "", q2: p.mindDumpDraft.q2 || "", q3: p.mindDumpDraft.q3 || "" }
-        : { q1: "", q2: "", q3: "" },
-      foodLogs: p.foodLogs && typeof p.foodLogs === "object" ? p.foodLogs : {}
-    };
-  } catch (e) { return d; }
+    if (!isPlainObj(p)) { corruptStorageDetected = true; return d; }
+    return normalizeState(p, null);
+  } catch (e) {
+    corruptStorageDetected = true;
+    return d;
+  }
 })();
-
-function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
-}
 
 let toastT = null;
 function toast(msg) {
-  const el = $("toast");
-  el.textContent = msg;
-  el.classList.add("show");
+  const elNode = $("toast");
+  elNode.textContent = msg;
+  elNode.classList.add("show");
   clearTimeout(toastT);
-  toastT = setTimeout(() => el.classList.remove("show"), 2300);
+  toastT = setTimeout(() => elNode.classList.remove("show"), 2600);
+}
+
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    return true;
+  } catch (e) {
+    toast("Speicherfehler: Lokaler Speicher voll oder blockiert! Bitte Backup exportieren.");
+    return false;
+  }
 }
 
 function el(tag, attrs, children) {
@@ -607,14 +633,46 @@ function el(tag, attrs, children) {
   return node;
 }
 
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).then(() => true).catch(() => fallbackCopy(text));
+  }
+  return Promise.resolve(fallbackCopy(text));
+}
+
+function fallbackCopy(text) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return !!ok;
+  } catch (e) { return false; }
+}
+
 /* Audio & WakeLock */
 let actx = null, sndOn = true, wakeLock = null, keepAwake = false;
+
+function unlockAudio() {
+  try {
+    if (!actx) {
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (C) actx = new C();
+    }
+    if (actx && actx.state === "suspended") actx.resume().catch(() => {});
+  } catch (e) {}
+}
+
 function tone(f, ms, del) {
   if (!sndOn) return;
   try {
-    if (!actx) { const C = window.AudioContext || window.webkitAudioContext; if (C) actx = new C(); }
+    unlockAudio();
     if (!actx) return;
-    if (actx.state === "suspended") actx.resume();
     const t = actx.currentTime + (del || 0) / 1000;
     const o = actx.createOscillator(), g = actx.createGain();
     o.frequency.setValueAtTime(f, t);
@@ -625,6 +683,7 @@ function tone(f, ms, del) {
     o.start(t); o.stop(t + ms / 1000 + 0.02);
   } catch (e) {}
 }
+
 function cue(type) {
   if (type === "tick") { tone(520, 90); if (navigator.vibrate) navigator.vibrate(40); }
   else if (type === "start") { tone(880, 250); if (navigator.vibrate) navigator.vibrate(120); }
@@ -632,26 +691,82 @@ function cue(type) {
   else if (type === "done") { tone(587, 140); tone(740, 140, 160); tone(880, 320, 320); if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 220]); }
   else if (type === "breath") { tone(432, 150); }
 }
+
+function setWakeUi(on) {
+  $("wakePill").textContent = on ? "Display: Wach" : "Display: Auto";
+  $("wakePill").classList.toggle("on", !!on);
+}
+
+function isAnyTimerRunning() {
+  return (tState !== "idle" && tState !== "done" && !paused) || brRun;
+}
+
 async function lockScreen() {
   keepAwake = true;
   if (!("wakeLock" in navigator)) return;
+  if (wakeLock && !wakeLock.released) { setWakeUi(true); return; }
   try {
-    wakeLock = await navigator.wakeLock.request("screen");
-    $("wakePill").textContent = "Display: Wach";
-    $("wakePill").classList.add("on");
-  } catch (e) {}
+    const sentinel = await navigator.wakeLock.request("screen");
+    wakeLock = sentinel;
+    setWakeUi(true);
+    sentinel.addEventListener("release", () => {
+      if (wakeLock === sentinel) wakeLock = null;
+      setWakeUi(false);
+    });
+  } catch (e) {
+    setWakeUi(false);
+  }
 }
-function unlockScreen() {
+
+function maybeUnlockScreen() {
+  if (isAnyTimerRunning()) return;
   keepAwake = false;
-  $("wakePill").textContent = "Display: Auto";
-  $("wakePill").classList.remove("on");
-  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  setWakeUi(false);
+  if (wakeLock) {
+    const s = wakeLock;
+    wakeLock = null;
+    s.release().catch(() => {});
+  }
 }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && keepAwake) lockScreen(); });
+
+/* Tageswechsel bei geöffneter PWA */
+let currentIsoDay = isoDate();
+function handleDayRollover() {
+  const nowIso = isoDate();
+  if (nowIso === currentIsoDay) return;
+  const prevIso = currentIsoDay;
+  currentIsoDay = nowIso;
+  $("datePill").textContent = deDate(nowIso);
+  if ($("trDate").value === prevIso) $("trDate").value = nowIso;
+  if ($("bpDate").value === prevIso) $("bpDate").value = nowIso;
+  if ($("bdDate").value === prevIso) $("bdDate").value = nowIso;
+  if (focDate === prevIso) { focDate = nowIso; renderFocus(); }
+  if (fDate === prevIso) {
+    const n = new Date();
+    fDate = nowIso; calY = n.getFullYear(); calM = n.getMonth();
+    renderCal(); renderFoodDay();
+  }
+  updateDailyStat();
+  updateDailyOverview();
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    handleDayRollover();
+    if (isAnyTimerRunning() && keepAwake) lockScreen();
+    if (tState !== "idle" && tState !== "done" && !paused) tick();
+    if (brRun) updBreath();
+  }
+});
+window.addEventListener("focus", handleDayRollover);
 
 /* Tab-Wechsel */
 function switchTab(tabId) {
-  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x.getAttribute("data-t") === tabId));
+  document.querySelectorAll(".tab").forEach(x => {
+    const active = x.getAttribute("data-t") === tabId;
+    x.classList.toggle("active", active);
+    x.setAttribute("aria-selected", active ? "true" : "false");
+  });
   document.querySelectorAll(".panel").forEach(x => x.classList.toggle("active", x.id === tabId));
   $("mainBox").scrollTop = 0;
   if (tabId === "p-daily") updateDailyOverview();
@@ -739,12 +854,24 @@ const PLANS = {
   ]
 };
 
-let wMode = "kettlebell", tState = "idle", exIdx = 0, endTs = 0, durMs = 45000, tInt = null, lastBeep = -1;
+let wMode = "kettlebell", tState = "idle", paused = false, pausedRemMs = 0, exIdx = 0, endTs = 0, durMs = 45000, tInt = null, lastBeep = -1;
 const openSet = new Set();
 
 function displayExIdx() {
   if (tState === "rest") return Math.min(exIdx + 1, PLANS[wMode].length - 1);
   return exIdx;
+}
+
+function updatePhaseLabel() {
+  if (paused) {
+    $("tPhase").textContent = "PAUSIERT · ÜBUNG " + (displayExIdx() + 1) + " / 7";
+  } else if (tState === "prep") {
+    $("tPhase").textContent = "VORBEREITUNG (5s) · BEREIT MACHEN";
+  } else if (tState === "work") {
+    $("tPhase").textContent = "BELASTUNG · ÜBUNG " + (exIdx + 1) + " / 7";
+  } else if (tState === "rest") {
+    $("tPhase").textContent = "PAUSE / VORBEREITUNG · GLEICH ÜBUNG " + (exIdx + 2) + " / 7";
+  }
 }
 
 function renderActiveEx() {
@@ -762,18 +889,35 @@ function renderExList() {
   box.innerHTML = "";
   PLANS[wMode].forEach((ex, i) => {
     const key = wMode + "_" + i;
-    const isCur = i === exIdx && (tState === "prep" || tState === "work");
+    const isCur = i === exIdx && (tState === "prep" || tState === "work" || tState === "idle");
     const isNext = i === (exIdx + 1) && tState === "rest";
     const isOpen = openSet.has(key);
     const jumpBtn = el("button", { type: "button", cls: "btn btn-sm", txt: "Hierhin springen" });
     jumpBtn.addEventListener("click", e => {
       e.stopPropagation();
+      unlockAudio();
       exIdx = i;
-      if (tState === "idle" || tState === "done") { renderActiveEx(); renderExList(); toast("Übung " + (i + 1) + " gewählt"); }
-      else { setPhase("work", 45); toast("Sprung zu Übung " + (i + 1)); }
+      if (tState === "idle" || tState === "done") {
+        tState = "idle"; paused = false; pausedRemMs = 0;
+        $("tStage").className = "stage";
+        $("tPhase").textContent = "BEREIT · ÜBUNG " + (exIdx + 1) + " / 7";
+        $("tDigits").textContent = "00:45";
+        $("tFill").style.width = "0%";
+        $("tStart").textContent = "▶ Starten";
+        renderActiveEx(); renderExList();
+        toast("Übung " + (i + 1) + " gewählt");
+      } else {
+        paused = false; pausedRemMs = 0;
+        lockScreen();
+        $("tStart").textContent = "⏸ Pause";
+        setPhase("work", 45, false);
+        clearInterval(tInt); tInt = setInterval(tick, 200);
+        tick();
+        toast("Sprung zu Übung " + (i + 1));
+      }
     });
     const rightControls = [];
-    if (isCur) rightControls.push(el("span", { cls: "badge b-grn", txt: "Aktiv" }));
+    if (i === exIdx && (tState === "prep" || tState === "work")) rightControls.push(el("span", { cls: "badge b-grn", txt: paused ? "Pausiert" : "Aktiv" }));
     else if (isNext) rightControls.push(el("span", { cls: "badge b-blue", txt: "Gleich dran" }));
     rightControls.push(jumpBtn);
     rightControls.push(el("span", { style: "color:var(--mut);font-size:12px", txt: isOpen ? "▲" : "▼" }));
@@ -788,61 +932,114 @@ function renderExList() {
     });
     const svgWrap = el("div", { cls: "svg-box" }, getSvg(ex.s));
     const drawer = el("div", { cls: "drawer" + (isOpen ? " open" : "") }, [svgWrap, el("div", { cls: "cue", txt: ex.c }), el("p", { cls: "sub", txt: ex.g })]);
-    const itemCls = "item" + (isCur ? " cur" : (isNext ? " nxt" : ""));
+    const itemCls = "item" + (i === exIdx && (tState === "prep" || tState === "work") ? " cur" : (isNext ? " nxt" : (isCur && tState === "idle" && exIdx > 0 ? " nxt" : "")));
     box.appendChild(el("div", { cls: itemCls }, [hdr, drawer]));
   });
 }
 
-function setPhase(ph, sec) {
-  tState = ph; durMs = sec * 1000; endTs = Date.now() + durMs; lastBeep = -1;
+function setPhase(ph, sec, silent, baseTs) {
+  tState = ph; durMs = sec * 1000; endTs = (baseTs || Date.now()) + durMs; lastBeep = -1;
   $("tStage").className = "stage " + ph;
-  if (ph === "prep") $("tPhase").textContent = "VORBEREITUNG (5s) · BEREIT MACHEN";
-  else if (ph === "work") { $("tPhase").textContent = "BELASTUNG · ÜBUNG " + (exIdx + 1) + " / 7"; cue("start"); }
-  else if (ph === "rest") { $("tPhase").textContent = "PAUSE / VORBEREITUNG · GLEICH ÜBUNG " + (exIdx + 2) + " / 7"; cue("rest"); }
-  renderActiveEx(); renderExList(); tick();
+  updatePhaseLabel();
+  if (!silent) {
+    if (ph === "work") cue("start");
+    else if (ph === "rest") cue("rest");
+  }
+  renderActiveEx(); renderExList();
+}
+
+function finishWorkout(silent) {
+  clearInterval(tInt); tInt = null;
+  tState = "done"; paused = false; pausedRemMs = 0;
+  maybeUnlockScreen();
+  if (!silent) cue("done");
+  $("tStage").className = "stage done";
+  $("tPhase").textContent = "GESCHAFFT · 7/7 ABGESCHLOSSEN";
+  $("tDigits").textContent = "00:00";
+  $("tFill").style.width = "100%";
+  $("tStart").textContent = "▶ Erneut starten";
+  state.dailyWorkouts[isoDate()] = { completed: true, mode: wMode, timestamp: new Date().toISOString() };
+  save(); updateDailyStat(); renderExList();
+  toast("Stark! 7-Minuten-Einheit gespeichert.");
 }
 
 function tick() {
+  if (tState === "idle" || tState === "done" || paused) return;
+  let now = Date.now(), guard = 0;
+  while (tState !== "idle" && tState !== "done" && now >= endTs && guard++ < 25) {
+    const lagging = (now - endTs) > 1500;
+    const prevEnd = endTs;
+    if (tState === "prep") {
+      setPhase("work", 45, lagging, prevEnd);
+    } else if (tState === "work") {
+      if (exIdx >= 6) { finishWorkout(lagging); return; }
+      setPhase("rest", 15, lagging, prevEnd);
+    } else if (tState === "rest") {
+      exIdx++;
+      setPhase("work", 45, lagging, prevEnd);
+    }
+    now = Date.now();
+  }
   if (tState === "idle" || tState === "done") return;
-  const rem = Math.max(0, endTs - Date.now());
+  const rem = Math.max(0, endTs - now);
   const sec = Math.ceil(rem / 1000);
   $("tDigits").textContent = String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
   $("tFill").style.width = Math.min(100, ((durMs - rem) / durMs) * 100) + "%";
   if (sec <= 3 && sec >= 1 && sec !== lastBeep) { lastBeep = sec; cue("tick"); }
-  if (rem <= 0) {
-    if (tState === "prep") setPhase("work", 45);
-    else if (tState === "work") {
-      if (exIdx >= 6) {
-        clearInterval(tInt); tInt = null; tState = "done"; unlockScreen(); cue("done");
-        $("tStage").className = "stage done"; $("tPhase").textContent = "GESCHAFFT · 7/7 ABGESCHLOSSEN";
-        $("tDigits").textContent = "00:00"; $("tFill").style.width = "100%"; $("tStart").textContent = "▶ Erneut starten";
-        state.dailyWorkouts[isoDate()] = { completed: true, mode: wMode, timestamp: new Date().toISOString() };
-        save(); updateDailyStat(); renderExList(); toast("Stark! 7-Minuten-Einheit gespeichert.");
-      } else setPhase("rest", 15);
-    } else if (tState === "rest") { exIdx++; setPhase("work", 45); }
-  }
 }
 
 $("tStart").addEventListener("click", () => {
-  lockScreen();
+  unlockAudio();
   if (tState === "idle" || tState === "done") {
-    exIdx = 0; setPhase("prep", 5); $("tStart").textContent = "⏸ Läuft...";
+    if (tState === "done") exIdx = 0;
+    paused = false; pausedRemMs = 0;
+    lockScreen();
+    setPhase("prep", 5, false);
+    $("tStart").textContent = "⏸ Pause";
     clearInterval(tInt); tInt = setInterval(tick, 200);
+    tick();
+  } else if (!paused) {
+    paused = true;
+    pausedRemMs = Math.max(0, endTs - Date.now());
+    clearInterval(tInt); tInt = null;
+    $("tStart").textContent = "▶ Weiter";
+    updatePhaseLabel();
+    renderExList();
+    maybeUnlockScreen();
+  } else {
+    paused = false;
+    endTs = Date.now() + pausedRemMs;
+    lockScreen();
+    $("tStart").textContent = "⏸ Pause";
+    updatePhaseLabel();
+    renderExList();
+    clearInterval(tInt); tInt = setInterval(tick, 200);
+    tick();
   }
 });
+
 $("tReset").addEventListener("click", () => {
-  clearInterval(tInt); tInt = null; tState = "idle"; exIdx = 0; unlockScreen();
+  clearInterval(tInt); tInt = null; tState = "idle"; paused = false; pausedRemMs = 0; exIdx = 0;
+  maybeUnlockScreen();
   $("tStage").className = "stage"; $("tPhase").textContent = "BEREIT · 7 ÜBUNGEN";
   $("tDigits").textContent = "00:45"; $("tFill").style.width = "0%"; $("tStart").textContent = "▶ Starten";
   renderActiveEx(); renderExList();
 });
-$("sndBtn").addEventListener("click", e => { sndOn = !sndOn; e.target.textContent = sndOn ? "🔊 Ton an" : "🔇 Ton aus"; if (sndOn) tone(660, 90); });
+
+$("sndBtn").addEventListener("click", e => {
+  unlockAudio();
+  sndOn = !sndOn;
+  e.target.textContent = sndOn ? "🔊 Ton an" : "🔇 Ton aus";
+  if (sndOn) tone(660, 90);
+});
+
 document.querySelectorAll("[data-wm]").forEach(b => b.addEventListener("click", () => {
   wMode = b.getAttribute("data-wm");
   $("mKb").classList.toggle("active", wMode === "kettlebell");
   $("mBw").classList.toggle("active", wMode === "bodyweight");
   $("tReset").click();
 }));
+
 function updateDailyStat() {
   const ok = !!state.dailyWorkouts[isoDate()];
   $("dailyStat").textContent = ok ? "Heute: ✓ Abgeschlossen" : "Heute: Noch offen";
@@ -868,6 +1065,7 @@ const TPLANS = {
   ]
 };
 let tPlan = "studio";
+
 function renderTrPlan() {
   const box = $("trCards");
   box.innerHTML = "";
@@ -889,12 +1087,16 @@ function renderTrPlan() {
     card.appendChild(top); card.appendChild(inps); box.appendChild(card);
   });
 }
+
 function renderTrHist() {
   $("trCnt").textContent = String(state.trainingLogs.length);
   const box = $("trHist"); box.innerHTML = "";
   if (!state.trainingLogs.length) { box.appendChild(el("p", { cls: "sub", txt: "Noch keine Trainingseinheiten gespeichert." })); return; }
-  state.trainingLogs.slice(-8).reverse().forEach(l => {
-    const txt = (l.exercises || []).map(e => e.title.replace(/^\d+\.\s*/, "") + ": " + e.weight + " (" + e.reps + ")").join(" · ");
+  const sorted = state.trainingLogs.slice().sort((a, b) =>
+    String(a.date || "").localeCompare(String(b.date || "")) || ((Number(a.id) || 0) - (Number(b.id) || 0))
+  );
+  sorted.slice(-8).reverse().forEach(l => {
+    const txt = (l.exercises || []).map(e => String(e.title || "").replace(/^\d+\.\s*/, "") + ": " + e.weight + " (" + e.reps + ")").join(" · ");
     const hdr = el("div", { style: "display:flex;justify-content:space-between;align-items:center;margin-bottom:4px" }, [
       el("strong", { style: "font-size:13px", txt: deDate(l.date) + " · " + (l.plan === "home" ? "Heim-Gym" : "Fitnessstudio") }),
       el("span", { cls: "badge b-grn", txt: (l.exercises || []).length + " Übungen" })
@@ -904,12 +1106,14 @@ function renderTrHist() {
     box.appendChild(it);
   });
 }
+
 document.querySelectorAll("[data-tp]").forEach(b => b.addEventListener("click", () => {
   tPlan = b.getAttribute("data-tp");
   $("plMx").classList.toggle("active", tPlan === "studio");
   $("plHm").classList.toggle("active", tPlan === "home");
   renderTrPlan();
 }));
+
 $("trSave").addEventListener("click", () => {
   const done = [];
   TPLANS[tPlan].forEach(ex => {
@@ -921,7 +1125,7 @@ $("trSave").addEventListener("click", () => {
   });
   if (!done.length) { toast("Bitte mindestens eine Übung abhaken."); return; }
   state.trainingLogs.push({ id: Date.now(), date: $("trDate").value || isoDate(), plan: tPlan, exercises: done, notes: $("trNote").value.trim() });
-  save(); $("trNote").value = ""; renderTrHist(); toast("Training & Gewichte gespeichert!");
+  if (save()) { $("trNote").value = ""; renderTrHist(); toast("Training & Gewichte gespeichert!"); }
 });
 
 /* TAB 3: BLUTDRUCK */
@@ -936,8 +1140,16 @@ function bpCat(s, d) {
   if (s >= 130 || d >= 85) return { l: "Leicht erhöht", c: "b-amb" };
   return { l: "Normal", c: "b-grn" };
 }
+
 function renderBp() {
-  const sorted = state.bpLogs.slice().sort((a, b) => a.date.localeCompare(b.date) || (a.timeOfDay === "morning" ? -1 : 1));
+  const sorted = state.bpLogs.slice().sort((a, b) => {
+    const cmp = String(a.date || "").localeCompare(String(b.date || ""));
+    if (cmp !== 0) return cmp;
+    const ta = a.timeOfDay === "morning" ? 0 : 1;
+    const tb = b.timeOfDay === "morning" ? 0 : 1;
+    if (ta !== tb) return ta - tb;
+    return (Number(a.id) || 0) - (Number(b.id) || 0);
+  });
   const last = sorted.slice(-14);
   if (!last.length) {
     $("bpAvg").textContent = "--/--"; $("bpAvgP").textContent = "--"; $("bpMM").textContent = "-- / --";
@@ -963,15 +1175,21 @@ function renderBp() {
   const sPts = last.map((d, i) => gx(i).toFixed(1) + "," + gy(d.sys).toFixed(1)).join(" ");
   const dPts = last.map((d, i) => gx(i).toFixed(1) + "," + gy(d.dia).toFixed(1)).join(" ");
   const dots = last.map((d, i) => '<circle cx="' + gx(i).toFixed(1) + '" cy="' + gy(d.sys).toFixed(1) + '" r="3" fill="#38bdf8"/><circle cx="' + gx(i).toFixed(1) + '" cy="' + gy(d.dia).toFixed(1) + '" r="3" fill="#10b981"/>').join("");
-  $("bpChart").innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block"><line x1="' + pL + '" y1="' + gy(130) + '" x2="' + (W - pR) + '" y2="' + gy(130) + '" stroke="#f59e0b" stroke-dasharray="3 3" opacity=".6"/><text x="2" y="' + (gy(130) + 3) + '" fill="#fbbf24" font-size="9">130</text><line x1="' + pL + '" y1="' + gy(85) + '" x2="' + (W - pR) + '" y2="' + gy(85) + '" stroke="#10b981" stroke-dasharray="3 3" opacity=".5"/><text x="4" y="' + (gy(85) + 3) + '" fill="#34d399" font-size="9">85</text><polyline fill="none" stroke="#38bdf8" stroke-width="2.2" points="' + sPts + '"/><polyline fill="none" stroke="#10b981" stroke-width="2.2" points="' + dPts + '"/>' + dots + '<text x="' + pL + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9">' + deDate(last[0].date).slice(0, 5) + '</text><text x="' + (W - pR) + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9" text-anchor="end">' + deDate(last[last.length - 1].date).slice(0, 5) + '</text></svg>';
+  const dFirst = escSvg(deDate(last[0].date).slice(0, 5));
+  const dLast = escSvg(deDate(last[last.length - 1].date).slice(0, 5));
+  $("bpChart").innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block"><line x1="' + pL + '" y1="' + gy(130) + '" x2="' + (W - pR) + '" y2="' + gy(130) + '" stroke="#f59e0b" stroke-dasharray="3 3" opacity=".6"/><text x="2" y="' + (gy(130) + 3) + '" fill="#fbbf24" font-size="9">130</text><line x1="' + pL + '" y1="' + gy(85) + '" x2="' + (W - pR) + '" y2="' + gy(85) + '" stroke="#10b981" stroke-dasharray="3 3" opacity=".5"/><text x="4" y="' + (gy(85) + 3) + '" fill="#34d399" font-size="9">85</text><polyline fill="none" stroke="#38bdf8" stroke-width="2.2" points="' + sPts + '"/><polyline fill="none" stroke="#10b981" stroke-width="2.2" points="' + dPts + '"/>' + dots + '<text x="' + pL + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9">' + dFirst + '</text><text x="' + (W - pR) + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9" text-anchor="end">' + dLast + '</text></svg>';
 
   const tbl = el("table");
   tbl.appendChild(el("thead", null, el("tr", null, ["Datum", "Zeit", "RR", "Puls", "Status", ""].map(h => el("th", { txt: h })))));
   const tb = el("tbody");
   sorted.slice(-10).reverse().forEach(it => {
     const c = bpCat(it.sys, it.dia);
-    const del = el("button", { type: "button", cls: "btn btn-sm btn-red", txt: "×" });
-    del.addEventListener("click", () => { state.bpLogs = state.bpLogs.filter(x => x.id !== it.id); save(); renderBp(); toast("Gelöscht."); });
+    const del = el("button", { type: "button", cls: "btn btn-sm btn-red btn-del-row", txt: "×", "aria-label": "Blutdruck-Eintrag löschen" });
+    del.addEventListener("click", () => {
+      if (!confirm("Blutdruck-Messung vom " + deDate(it.date) + " (" + it.sys + "/" + it.dia + ") wirklich löschen?")) return;
+      state.bpLogs = state.bpLogs.filter(x => x.id !== it.id);
+      save(); renderBp(); toast("Gelöscht.");
+    });
     tb.appendChild(el("tr", null, [
       el("td", { txt: deDate(it.date) }),
       el("td", { txt: it.timeOfDay === "morning" ? "☀" : "☾" }),
@@ -984,21 +1202,28 @@ function renderBp() {
   tbl.appendChild(tb);
   $("bpHist").innerHTML = ""; $("bpHist").appendChild(tbl);
 }
+
 $("bpSave").addEventListener("click", () => {
   const sys = Number($("bpSys").value), dia = Number($("bpDia").value), pulse = Number($("bpPul").value);
-  if (!sys || !dia || !pulse || sys < 60 || dia < 35) { toast("Bitte gültige Werte eingeben."); return; }
+  if (!Number.isFinite(sys) || !Number.isFinite(dia) || !Number.isFinite(pulse) || sys < 60 || sys > 260 || dia < 35 || dia > 160 || pulse < 30 || pulse > 230) {
+    toast("Bitte plausible Werte eingeben."); return;
+  }
+  if (sys <= dia) { toast("Systole muss größer als Diastole sein."); return; }
   state.bpLogs.push({ id: Date.now(), date: $("bpDate").value || isoDate(), timeOfDay: bpTime, sys, dia, pulse });
-  save(); $("bpSys").value = ""; $("bpDia").value = ""; $("bpPul").value = ""; renderBp(); toast("Blutdruck gespeichert.");
+  if (save()) { $("bpSys").value = ""; $("bpDia").value = ""; $("bpPul").value = ""; renderBp(); toast("Blutdruck gespeichert."); }
 });
 
 /* TAB 4: FOKUS */
-let focDate = isoDate();
+let focDate = isoDate(), focSavT = null;
+function peekCog(iso) {
+  return state.cognitionLogs[iso] || { c1: false, c2: false, c3: false, note: "" };
+}
 function getCog(iso) {
   if (!state.cognitionLogs[iso]) state.cognitionLogs[iso] = { c1: false, c2: false, c3: false, note: "" };
   return state.cognitionLogs[iso];
 }
 function renderFocus() {
-  const tod = isoDate(), isTod = focDate === tod, e = getCog(focDate);
+  const tod = isoDate(), isTod = focDate === tod, e = peekCog(focDate);
   $("focLbl").textContent = isTod ? "Heute, " + deDate(focDate) : "Rückblick: " + deDate(focDate);
   $("focToday").style.display = isTod ? "none" : "inline-flex";
   [1, 2, 3].forEach(i => {
@@ -1022,7 +1247,14 @@ function renderFocus() {
   updateDailyOverview();
 }
 [1, 2, 3].forEach(i => $("fChk" + i).addEventListener("change", e => { getCog(focDate)["c" + i] = e.target.checked; save(); renderFocus(); }));
-$("fNote").addEventListener("input", e => { getCog(focDate).note = e.target.value; save(); $("fSav").textContent = "Gespeichert ✓"; setTimeout(() => { $("fSav").textContent = "Speichert automatisch"; }, 1100); });
+$("fNote").addEventListener("input", e => {
+  getCog(focDate).note = e.target.value;
+  if (save()) {
+    $("fSav").textContent = "Gespeichert ✓";
+    clearTimeout(focSavT);
+    focSavT = setTimeout(() => { $("fSav").textContent = "Speichert automatisch"; }, 1100);
+  }
+});
 $("focToday").addEventListener("click", () => { focDate = isoDate(); renderFocus(); });
 
 /* TAB 5: RUHE */
@@ -1030,20 +1262,40 @@ const BR_PH = [{ l: "Einatmen", s: 1.55 }, { l: "Halten", s: 1.55 }, { l: "Ausat
 let brRun = false, brInt = null, brIdx = 0, brEnd = 0, brRnd = 0, brSnd = true;
 function updBreath() {
   if (!brRun) { $("brCirc").style.transform = "scale(1)"; $("brPh").textContent = "Bereit"; $("brSec").textContent = "4s"; return; }
-  const rem = Math.max(0, brEnd - Date.now()), sec = Math.ceil(rem / 1000), ph = BR_PH[brIdx];
+  const now = Date.now();
+  let steps = 0;
+  while (brRun && now >= brEnd && steps++ < 400) {
+    brIdx = (brIdx + 1) % 4;
+    if (brIdx === 0) { brRnd++; $("brRounds").textContent = "Abgeschlossene Runden: " + brRnd; }
+    brEnd += 4000;
+  }
+  if (now >= brEnd) brEnd = now + 4000;
+  if (steps > 0 && steps <= 2 && brSnd) cue("breath");
+  const rem = Math.max(0, brEnd - now), sec = Math.ceil(rem / 1000), ph = BR_PH[brIdx];
   $("brPh").textContent = ph.l; $("brSec").textContent = sec + "s";
   const pr = 1 - rem / 4000;
   const sc = brIdx === 0 ? 1 + 0.55 * pr : (brIdx === 2 ? 1.55 - 0.55 * pr : ph.s);
   $("brCirc").style.transform = "scale(" + sc.toFixed(3) + ")";
-  if (rem <= 0) {
-    brIdx = (brIdx + 1) % 4;
-    if (brIdx === 0) { brRnd++; $("brRounds").textContent = "Abgeschlossene Runden: " + brRnd; }
-    brEnd = Date.now() + 4000; if (brSnd) cue("breath");
-  }
 }
-$("brStart").addEventListener("click", () => { if (brRun) return; lockScreen(); brRun = true; brIdx = 0; brEnd = Date.now() + 4000; if (brSnd) cue("breath"); clearInterval(brInt); brInt = setInterval(updBreath, 100); updBreath(); });
-$("brStop").addEventListener("click", () => { brRun = false; clearInterval(brInt); brInt = null; if (tState === "idle" || tState === "done") unlockScreen(); updBreath(); });
-$("brSnd").addEventListener("click", e => { brSnd = !brSnd; e.target.textContent = brSnd ? "🔊 Ton an" : "🔇 Ton aus"; });
+$("brStart").addEventListener("click", () => {
+  unlockAudio();
+  if (brRun) return;
+  brRun = true; brIdx = 0; brEnd = Date.now() + 4000;
+  lockScreen();
+  if (brSnd) cue("breath");
+  clearInterval(brInt); brInt = setInterval(updBreath, 100);
+  updBreath();
+});
+$("brStop").addEventListener("click", () => {
+  brRun = false; clearInterval(brInt); brInt = null;
+  maybeUnlockScreen();
+  updBreath();
+});
+$("brSnd").addEventListener("click", e => {
+  unlockAudio();
+  brSnd = !brSnd;
+  e.target.textContent = brSnd ? "🔊 Ton an" : "🔇 Ton aus";
+});
 
 function renderDumps() {
   const box = $("dHist"); box.innerHTML = "";
@@ -1067,11 +1319,11 @@ $("dSave").addEventListener("click", () => {
   state.mindDumps.push({ id: Date.now(), date: isoDate(), q1, q2, q3 });
   state.mindDumpDraft = { q1: "", q2: "", q3: "" };
   $("dq1").value = ""; $("dq2").value = ""; $("dq3").value = "";
-  save(); renderDumps(); toast("Mind-Dump gespeichert & Kopf frei!");
+  if (save()) { renderDumps(); toast("Mind-Dump gespeichert & Kopf frei!"); }
 });
 
 /* TAB 6: KÖRPER & ESSEN + MEAL-PREP REZEPTE */
-let fDate = isoDate(), calY = new Date().getFullYear(), calM = new Date().getMonth(), bMetric = "weight";
+let fDate = isoDate(), calY = new Date().getFullYear(), calM = new Date().getMonth(), bMetric = "weight", foodSavT = null;
 
 const RECIPES = [
   {
@@ -1204,9 +1456,7 @@ document.querySelectorAll("[data-prep-meal]").forEach(sel => {
     if (!rid) return;
     const rec = RECIPES.find(x => x.id === rid);
     const mealKey = sel.getAttribute("data-prep-meal");
-    if (rec && mealKey) {
-      applyRecipeToMeal(mealKey, rec.short);
-    }
+    if (rec && mealKey) applyRecipeToMeal(mealKey, rec.short);
     sel.value = "";
   });
 });
@@ -1222,13 +1472,12 @@ function clearMealField(mealKey) {
 }
 
 document.querySelectorAll("[data-del-meal]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    clearMealField(btn.getAttribute("data-del-meal"));
-  });
+  btn.addEventListener("click", () => clearMealField(btn.getAttribute("data-del-meal")));
 });
 
 $("clearDayMeals").addEventListener("click", () => {
-  state.foodLogs[fDate] = { replacedMeal: false, noSnacking: false, breakfast: "", lunch: "", dinner: "", snacks: "" };
+  if (!confirm("Alle Mahlzeiten und Haken für " + deDate(fDate) + " wirklich löschen?")) return;
+  delete state.foodLogs[fDate];
   save();
   flashFood();
   renderFoodDay();
@@ -1252,8 +1501,7 @@ function applyRecipeToMeal(mealKey, shortText) {
   const l = getFood(fDate);
   l[mealKey] = shortText;
   l.replacedMeal = true;
-  save(); flashFood(); renderFoodDay(); renderCal();
-  toast("In Planer übernommen & Fokus-Haken gesetzt!");
+  if (save()) { flashFood(); renderFoodDay(); renderCal(); toast("In Planer übernommen & Fokus-Haken gesetzt!"); }
 }
 
 function renderRecipes() {
@@ -1286,13 +1534,7 @@ function renderRecipes() {
 
     const btnCp = el("button", { type: "button", cls: "btn btn-sm full", style: "margin-top:6px", txt: "📋 Rezept-Text kopieren" });
     btnCp.addEventListener("click", () => {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(recipeAsText(r))
-          .then(() => toast("Rezept-Text kopiert!"))
-          .catch(() => toast("Kopieren nicht möglich."));
-      } else {
-        toast("Zwischenablage nicht verfügbar.");
-      }
+      copyText(recipeAsText(r)).then(ok => toast(ok ? "Rezept-Text kopiert!" : "Kopieren nicht möglich."));
     });
 
     const body = el("div", { cls: "rec-body" }, [
@@ -1320,6 +1562,10 @@ document.querySelectorAll("[data-bs]").forEach(b => b.addEventListener("click", 
   $("subMet").style.display = s === "metrics" ? "flex" : "none";
   if (s === "metrics") renderBody();
 }));
+
+function peekFood(iso) {
+  return state.foodLogs[iso] || { replacedMeal: false, noSnacking: false, breakfast: "", lunch: "", dinner: "", snacks: "" };
+}
 function getFood(iso) {
   if (!state.foodLogs[iso]) state.foodLogs[iso] = { replacedMeal: false, noSnacking: false, breakfast: "", lunch: "", dinner: "", snacks: "" };
   return state.foodLogs[iso];
@@ -1348,22 +1594,26 @@ function renderCal() {
 function renderFoodDay() {
   const tod = isoDate(), tmr = addDays(tod, 1);
   $("foodHead").textContent = fDate === tod ? "Heute, " + deDate(fDate) : (fDate === tmr ? "Morgen (Vorplanung), " + deDate(fDate) : (fDate > tod ? "Vorplanung, " + deDate(fDate) : "Rückblick, " + deDate(fDate)));
-  const l = getFood(fDate);
+  const l = peekFood(fDate);
   $("fdRep").checked = !!l.replacedMeal; $("fdSnk").checked = !!l.noSnacking;
   $("fdRow1").classList.toggle("on", !!l.replacedMeal); $("fdRow2").classList.toggle("on", !!l.noSnacking);
   $("fdB").value = l.breakfast || ""; $("fdL").value = l.lunch || ""; $("fdD").value = l.dinner || ""; $("fdS").value = l.snacks || "";
   updateDailyOverview();
 }
-function flashFood() { $("foodSav").textContent = "Gespeichert ✓"; setTimeout(() => { $("foodSav").textContent = "Speichert automatisch"; }, 1000); }
+function flashFood() {
+  $("foodSav").textContent = "Gespeichert ✓";
+  clearTimeout(foodSavT);
+  foodSavT = setTimeout(() => { $("foodSav").textContent = "Speichert automatisch"; }, 1000);
+}
 
 $("calPrev").addEventListener("click", () => { calM--; if (calM < 0) { calM = 11; calY--; } renderCal(); });
 $("calNext").addEventListener("click", () => { calM++; if (calM > 11) { calM = 0; calY++; } renderCal(); });
 $("calToday").addEventListener("click", () => { const n = new Date(); fDate = isoDate(n); calY = n.getFullYear(); calM = n.getMonth(); renderCal(); renderFoodDay(); });
 $("calTmrw").addEventListener("click", () => { const t = addDays(isoDate(), 1), p = t.split("-").map(Number); fDate = t; calY = p[0]; calM = p[1] - 1; renderCal(); renderFoodDay(); });
-$("fdRep").addEventListener("change", e => { getFood(fDate).replacedMeal = e.target.checked; save(); flashFood(); renderFoodDay(); renderCal(); });
-$("fdSnk").addEventListener("change", e => { getFood(fDate).noSnacking = e.target.checked; save(); flashFood(); renderFoodDay(); renderCal(); });
+$("fdRep").addEventListener("change", e => { getFood(fDate).replacedMeal = e.target.checked; if (save()) flashFood(); renderFoodDay(); renderCal(); });
+$("fdSnk").addEventListener("change", e => { getFood(fDate).noSnacking = e.target.checked; if (save()) flashFood(); renderFoodDay(); renderCal(); });
 [["fdB", "breakfast"], ["fdL", "lunch"], ["fdD", "dinner"], ["fdS", "snacks"]].forEach(p => {
-  $(p[0]).addEventListener("input", e => { getFood(fDate)[p[1]] = e.target.value; save(); flashFood(); renderCal(); updateDailyOverview(); });
+  $(p[0]).addEventListener("input", e => { getFood(fDate)[p[1]] = e.target.value; if (save()) flashFood(); renderCal(); updateDailyOverview(); });
 });
 
 document.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", () => {
@@ -1371,8 +1621,11 @@ document.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", 
   document.querySelectorAll("[data-bm]").forEach(x => x.classList.toggle("active", x.getAttribute("data-bm") === bMetric));
   renderBody();
 }));
+
 function renderBody() {
-  const sorted = state.bodyLogs.slice().sort((a, b) => a.date.localeCompare(b.date));
+  const sorted = state.bodyLogs.slice().sort((a, b) =>
+    String(a.date || "").localeCompare(String(b.date || "")) || ((Number(a.id) || 0) - (Number(b.id) || 0))
+  );
   const pts = sorted.filter(x => typeof x[bMetric] === "number" && !isNaN(x[bMetric]));
   const cols = { weight: "#38bdf8", muscle: "#10b981", water: "#a78bfa", fat: "#f59e0b" };
   if (!pts.length) {
@@ -1385,13 +1638,19 @@ function renderBody() {
     const gy = v => pT + pH - ((v - y0) / (y1 - y0)) * pH;
     const poly = sl.map((d, i) => gx(i).toFixed(1) + "," + gy(d[bMetric]).toFixed(1)).join(" ");
     const dots = sl.map((d, i) => '<circle cx="' + gx(i).toFixed(1) + '" cy="' + gy(d[bMetric]).toFixed(1) + '" r="3.5" fill="' + cols[bMetric] + '"/>').join("");
-    $("bdChart").innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block"><text x="2" y="' + (pT + 4) + '" fill="#94a3b8" font-size="9">' + mx.toFixed(1) + '</text><text x="2" y="' + (H - pB) + '" fill="#94a3b8" font-size="9">' + mn.toFixed(1) + '</text><polyline fill="none" stroke="' + cols[bMetric] + '" stroke-width="2.4" points="' + poly + '"/>' + dots + '<text x="' + pL + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9">' + deDate(sl[0].date).slice(0, 5) + '</text><text x="' + (W - pR) + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9" text-anchor="end">' + deDate(sl[sl.length - 1].date).slice(0, 5) + '</text></svg>';
+    const dFirst = escSvg(deDate(sl[0].date).slice(0, 5));
+    const dLast = escSvg(deDate(sl[sl.length - 1].date).slice(0, 5));
+    $("bdChart").innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block"><text x="2" y="' + (pT + 4) + '" fill="#94a3b8" font-size="9">' + mx.toFixed(1) + '</text><text x="2" y="' + (H - pB) + '" fill="#94a3b8" font-size="9">' + mn.toFixed(1) + '</text><polyline fill="none" stroke="' + cols[bMetric] + '" stroke-width="2.4" points="' + poly + '"/>' + dots + '<text x="' + pL + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9">' + dFirst + '</text><text x="' + (W - pR) + '" y="' + (H - 4) + '" fill="#94a3b8" font-size="9" text-anchor="end">' + dLast + '</text></svg>';
   }
   const box = $("bdTbl"); box.innerHTML = "";
   if (!sorted.length) { box.appendChild(el("p", { cls: "sub", txt: "Noch keine Körper-Messwerte erfasst." })); return; }
-  const rows = sorted.map((it, i) => {
-    const pr = i > 0 ? sorted[i - 1] : null;
-    const dw = (pr && typeof it.weight === "number" && typeof pr.weight === "number") ? it.weight - pr.weight : null;
+  let prevWeight = null;
+  const rows = sorted.map(it => {
+    let dw = null;
+    if (typeof it.weight === "number" && !isNaN(it.weight)) {
+      if (prevWeight !== null) dw = it.weight - prevWeight;
+      prevWeight = it.weight;
+    }
     return Object.assign({}, it, { dw });
   }).reverse();
   const tbl = el("table");
@@ -1401,8 +1660,12 @@ function renderBody() {
     const dCell = el("td");
     if (r.dw !== null && !isNaN(r.dw)) dCell.appendChild(el("span", { cls: r.dw > 0 ? "pos" : (r.dw < 0 ? "neg" : ""), txt: (r.dw > 0 ? "+" : "") + r.dw.toFixed(1) }));
     else dCell.textContent = "—";
-    const del = el("button", { type: "button", cls: "btn btn-sm btn-red", txt: "×" });
-    del.addEventListener("click", () => { state.bodyLogs = state.bodyLogs.filter(x => x.id !== r.id); save(); renderBody(); toast("Messwert gelöscht."); });
+    const del = el("button", { type: "button", cls: "btn btn-sm btn-red btn-del-row", txt: "×", "aria-label": "Körper-Messwert löschen" });
+    del.addEventListener("click", () => {
+      if (!confirm("Körper-Messwert vom " + deDate(r.date) + " wirklich löschen?")) return;
+      state.bodyLogs = state.bodyLogs.filter(x => x.id !== r.id);
+      save(); renderBody(); toast("Messwert gelöscht.");
+    });
     tb.appendChild(el("tr", null, [
       el("td", { txt: deDate(r.date) }),
       el("td", null, el("strong", { txt: r.weight != null ? r.weight.toFixed(1) : "—" })),
@@ -1415,12 +1678,13 @@ function renderBody() {
   });
   tbl.appendChild(tb); box.appendChild(tbl);
 }
+
 $("bdSave").addEventListener("click", () => {
-  const num = id => { const v = $(id).value.trim(); return v === "" ? null : Number(v); };
+  const num = id => { const v = $(id).value.trim(); if (v === "") return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
   const weight = num("bdW"), muscle = num("bdM"), water = num("bdWa"), fat = num("bdF");
   if (weight === null && muscle === null && water === null && fat === null) { toast("Bitte mindestens einen Messwert eingeben."); return; }
   state.bodyLogs.push({ id: Date.now(), date: $("bdDate").value || isoDate(), weight, muscle, water, fat, notes: $("bdN").value.trim() });
-  save(); ["bdW", "bdM", "bdWa", "bdF", "bdN"].forEach(id => { $(id).value = ""; }); renderBody(); toast("Körperwerte gespeichert!");
+  if (save()) { ["bdW", "bdM", "bdWa", "bdF", "bdN"].forEach(id => { $(id).value = ""; }); renderBody(); toast("Körperwerte gespeichert!"); }
 });
 
 /* TAB 7: BACKUP */
@@ -1431,7 +1695,11 @@ function renderBackup() {
   const bCnt = (state.bpLogs || []).length;
   const fCnt = Object.keys(state.foodLogs || {}).filter(k => foodStat(k) !== "").length;
   const boCnt = (state.bodyLogs || []).length;
-  const foCnt = Object.keys(state.cognitionLogs || {}).length + (state.mindDumps || []).length;
+  const cogCnt = Object.keys(state.cognitionLogs || {}).filter(k => {
+    const c = state.cognitionLogs[k];
+    return c && (c.c1 || c.c2 || c.c3 || (c.note && c.note.trim()));
+  }).length;
+  const foCnt = cogCnt + (state.mindDumps || []).length;
   const totalItems = dCnt + tCnt + bCnt + fCnt + boCnt + foCnt;
 
   $("stKb").textContent = (new Blob([raw]).size / 1024).toFixed(1) + " KB";
@@ -1459,36 +1727,35 @@ function renderBackup() {
     warnBox.innerHTML = '<span>ℹ️ Alle Daten liegen offline in deinem Browser. Exportiere regelmäßig eine JSON-Sicherung für die langfristige Archivierung.</span>';
   }
 }
+
 $("expBtn").addEventListener("click", () => {
   state.lastBackup = new Date().toISOString(); save(); renderBackup();
   const url = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], { type: "application/json" }));
   const a = el("a", { href: url, download: "health-life-backup-" + isoDate() + ".json" });
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000); toast("JSON-Backup heruntergeladen.");
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  toast("JSON-Backup heruntergeladen.");
 });
+
 $("impInp").addEventListener("change", e => {
   const file = e.target.files && e.target.files[0]; if (!file) return;
   const rd = new FileReader();
   rd.onload = ev => {
     try {
       const p = JSON.parse(String(ev.target.result));
-      if (!p || typeof p !== "object") throw 0;
-      const d = defState();
-      state = {
-        version: 1, lastBackup: p.lastBackup || new Date().toISOString(),
-        dailyWorkouts: p.dailyWorkouts && typeof p.dailyWorkouts === "object" ? p.dailyWorkouts : d.dailyWorkouts,
-        trainingLogs: Array.isArray(p.trainingLogs) ? p.trainingLogs : d.trainingLogs,
-        bpLogs: Array.isArray(p.bpLogs) ? p.bpLogs : d.bpLogs,
-        cognitionLogs: p.cognitionLogs && typeof p.cognitionLogs === "object" ? p.cognitionLogs : d.cognitionLogs,
-        mindDumps: Array.isArray(p.mindDumps) ? p.mindDumps : d.mindDumps,
-        bodyLogs: Array.isArray(p.bodyLogs) ? p.bodyLogs : d.bodyLogs,
-        customWeights: p.customWeights && typeof p.customWeights === "object" ? p.customWeights : d.customWeights,
-        mindDumpDraft: p.mindDumpDraft && typeof p.mindDumpDraft === "object" ? { q1: p.mindDumpDraft.q1 || "", q2: p.mindDumpDraft.q2 || "", q3: p.mindDumpDraft.q3 || "" } : d.mindDumpDraft,
-        foodLogs: p.foodLogs && typeof p.foodLogs === "object" ? p.foodLogs : {}
-      };
-      save(); initAll(); toast("Backup erfolgreich wiederhergestellt!");
-    } catch (err) { toast("Fehler: Ungültige JSON-Datei."); }
-    finally { e.target.value = ""; }
+      if (!isPlainObj(p)) throw new Error("Kein Objekt");
+      const knownKeys = ["dailyWorkouts", "trainingLogs", "bpLogs", "cognitionLogs", "mindDumps", "bodyLogs", "customWeights", "mindDumpDraft", "foodLogs"];
+      if (!knownKeys.some(k => Object.prototype.hasOwnProperty.call(p, k))) {
+        throw new Error("Keine gültige Health-&-Life-Sicherungsdatei");
+      }
+      if (!confirm("Achtung: Alle aktuell gespeicherten Daten werden durch das Backup ersetzt. Fortfahren?")) return;
+      state = normalizeState(p, new Date().toISOString());
+      if (save()) { initAll(); toast("Backup erfolgreich wiederhergestellt!"); }
+    } catch (err) {
+      toast("Fehler: Ungültige oder fremde JSON-Datei.");
+    } finally {
+      e.target.value = "";
+    }
   };
   rd.readAsText(file);
 });
@@ -1496,6 +1763,7 @@ $("impInp").addEventListener("change", e => {
 /* INIT */
 function initAll() {
   const tod = isoDate();
+  currentIsoDay = tod;
   $("datePill").textContent = deDate(tod);
   $("trDate").value = tod; $("bpDate").value = tod; $("bdDate").value = tod;
   updateDailyStat(); updateDailyOverview(); renderActiveEx(); renderExList();
@@ -1506,6 +1774,10 @@ function initAll() {
   fDate = tod; calY = new Date().getFullYear(); calM = new Date().getMonth();
   populateMealDropdowns(); renderRecipes(); renderCal(); renderFoodDay(); renderBody();
   renderBackup();
+  if (corruptStorageDetected) {
+    corruptStorageDetected = false;
+    toast("Warnung: Lokale Daten waren beschädigt – bitte JSON-Backup importieren!");
+  }
 }
 initAll();
 })();
@@ -1531,7 +1803,7 @@ initAll();
   <div class="modal-box">
     <div class="modal-hdr">
       <h2 id="aboutTitle">ℹ️ Über Health & Life Dashboard</h2>
-      <button type="button" id="aboutCloseX" class="btn btn-sm">✕</button>
+      <button type="button" id="aboutCloseX" class="btn btn-sm" aria-label="Schließen">✕</button>
     </div>
     <div class="modal-body">
       <p><strong>100 % Offline & ohne Cloud:</strong> Ziel dieser App war es, einen übersichtlichen Gesundheits-, Trainings- und Alltagstracker zu schaffen, der komplett ohne Benutzerkonto, Cloud-Zwang oder Datenweitergabe auskommt. Alle Einträge bleiben lokal in deinem Browser (mit JSON-Backup).</p>
@@ -1561,6 +1833,11 @@ initAll();
   });
   aboutModal.addEventListener("click", e => {
     if (e.target === aboutModal) aboutModal.classList.remove("open");
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && aboutModal.classList.contains("open")) {
+      aboutModal.classList.remove("open");
+    }
   });
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {

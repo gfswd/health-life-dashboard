@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0f172a" />
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#38bdf8" stroke-width="18" />
+  <!-- Hantelscheiben links -->
+  <rect x="65" y="216" width="16" height="80" rx="6" fill="#10b981" />
+  <rect x="87" y="196" width="22" height="120" rx="8" fill="#10b981" />
+  <rect x="115" y="180" width="26" height="152" rx="10" fill="#10b981" />
+  <rect x="147" y="180" width="10" height="152" rx="4" fill="#10b981" />
+  <!-- Hantelscheiben rechts -->
+  <rect x="355" y="180" width="10" height="152" rx="4" fill="#10b981" />
+  <rect x="371" y="180" width="26" height="152" rx="10" fill="#10b981" />
+  <rect x="403" y="196" width="22" height="120" rx="8" fill="#10b981" />
+  <rect x="431" y="216" width="16" height="80" rx="6" fill="#10b981" />
+  <!-- Hantelstange mit EKG-Verbindung im Zentrum -->
+  <path d="M 157 256 L 205 256 L 217 192 L 235 340 L 255 132 L 275 380 L 289 276 L 301 256 L 355 256" fill="none" stroke="#10b981" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
