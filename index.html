@@ -51,6 +51,7 @@ main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:
 .seg button.active{background:var(--blue);color:#082f49;font-weight:700}
 .btn{appearance:none;border:1px solid var(--bdr2);background:var(--alt);color:var(--txt);font:600 13px var(--sans);padding:10px 14px;min-height:42px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.6;cursor:wait}
 .btn-blue{background:var(--blue);border-color:var(--blue);color:#082f49;font-weight:700}
 .btn-grn{background:var(--grn);border-color:var(--grn);color:#022c22;font-weight:700}
 .btn-red{background:var(--redBg);border-color:rgba(244,63,94,.45);color:#fda4af}
@@ -495,6 +496,7 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
         <button type="button" class="btn btn-blue full" id="expBtn">⬇ JSON-Backup exportieren</button>
         <label class="btn full" for="impInp" style="cursor:pointer">⬆ JSON-Backup importieren</label>
         <input type="file" id="impInp" accept=".json,application/json" style="display:none">
+        <button type="button" class="btn full" id="updBtn">🔄 Auf App-Update prüfen & neu laden</button>
       </div>
     </div>
   </section>
@@ -516,45 +518,94 @@ td{padding:7px 4px;border-bottom:1px solid rgba(38,53,79,.5)}
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<!-- DISCLAIMER MODAL (bei jedem Start) -->
+<div id="discModal" class="modal-backdrop open" role="dialog" aria-modal="true" aria-labelledby="discTitle">
+  <div class="modal-box" style="border-color:rgba(245,158,11,.55)">
+    <div class="modal-hdr">
+      <h2 id="discTitle" style="color:#fbbf24">⚠️ Wichtiger Hinweis & Haftungsausschluss</h2>
+    </div>
+    <div class="modal-body">
+      <p><strong>Training auf eigene Gefahr:</strong> Alle Übungen, Timings und Trainingspläne in dieser App erfolgen vollständig auf eigene Verantwortung und Gefahr.</p>
+      <p><strong>Keine Gesundheitsberatung:</strong> Diese Anwendung dient ausschließlich der persönlichen Dokumentation und Selbstorganisation. Sie stellt <strong>keine medizinische, ärztliche, physiotherapeutische oder ernährungswissenschaftliche Beratung</strong> dar und ersetzt keine Untersuchung durch Fachpersonal.</p>
+      <p style="font-size:12px;color:var(--mut)">Bei Schmerzen, Schwindel, Vorerkrankungen oder auffälligen Blutdruckwerten brich das Training sofort ab und konsultiere einen Arzt.</p>
+      <button type="button" id="discAccept" class="btn btn-grn full" style="margin-top:6px">✓ Verstanden & auf eigene Gefahr starten</button>
+    </div>
+  </div>
+</div>
+
+<!-- ÜBER DIE APP MODAL -->
+<div id="aboutModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h2 id="aboutTitle">ℹ️ Über Health & Life Dashboard</h2>
+      <button type="button" id="aboutCloseX" class="btn btn-sm" aria-label="Schließen">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>100 % Offline & ohne Cloud:</strong> Ziel dieser App war es, einen übersichtlichen Gesundheits-, Trainings- und Alltagstracker zu schaffen, der komplett ohne Benutzerkonto, Cloud-Zwang oder Datenweitergabe auskommt. Alle Einträge bleiben lokal in deinem Browser (mit JSON-Backup).</p>
+      <p><strong>Gelenkschonender Ansatz:</strong> Die hinterlegten Übungen und Routinen basieren auf gelenkschonenden Bewegungsabläufen (z. B. kontrollierte Hüft- und Rumpfstabilität, moderate Winkel, Polsterung).</p>
+      <p><strong>Mit KI entwickelt – frei anpassbar (MIT-Lizenz):</strong> Diese Single-File-HTML-App wurde mithilfe von Künstlicher Intelligenz erstellt. Der Quellcode ist bewusst schlank und offen gehalten, damit ihn jeder frei nutzen, mit einer eigenen KI weiterentwickeln oder mit HTML/JS-Kenntnissen an seine eigenen Bedürfnisse anpassen kann.</p>
+      <p style="font-size:12px;color:var(--mut)">Hinweis: Kein Medizinprodukt · Nutzung und Training auf eigene Gefahr.</p>
+      <button type="button" id="aboutCloseBtn" class="btn btn-blue full" style="margin-top:4px">Schließen</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
 "use strict";
 const KEY = "health_life_dashboard_v1";
 const $ = id => document.getElementById(id);
-const svgTpl = $("svg-defs").content;
+const on = (id, ev, fn) => { const n = $(id); if (n) n.addEventListener(ev, fn); };
+const svgTplEl = $("svg-defs");
+const svgTpl = svgTplEl ? svgTplEl.content : null;
 
-function isPlainObj(v) {
-  return !!v && typeof v === "object" && !Array.isArray(v);
-}
+/* Modals zuerst binden (funktionieren immer sofort) */
+on("discAccept", "click", () => { const m = $("discModal"); if (m) m.classList.remove("open"); });
+on("aboutBtn", "click", () => { const m = $("aboutModal"); if (m) m.classList.add("open"); });
+on("aboutCloseX", "click", () => { const m = $("aboutModal"); if (m) m.classList.remove("open"); });
+on("aboutCloseBtn", "click", () => { const m = $("aboutModal"); if (m) m.classList.remove("open"); });
+on("aboutModal", "click", e => { if (e.target === $("aboutModal")) $("aboutModal").classList.remove("open"); });
+document.addEventListener("keydown", e => {
+  const m = $("aboutModal");
+  if (e.key === "Escape" && m && m.classList.contains("open")) m.classList.remove("open");
+});
 
+/* Basis-Helfer */
+function isPlainObj(v) { return !!v && typeof v === "object" && !Array.isArray(v); }
 function escSvg(s) {
-  return String(s || "").replace(/[&<>"']/g, c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
+  return String(s || "").replace(/[&<>"']/g, c => {
+    if (c === "&") return "&" + "amp;";
+    if (c === "<") return "&" + "lt;";
+    if (c === ">") return "&" + "gt;";
+    if (c === '"') return "&" + "quot;";
+    return "&" + "#39;";
+  });
 }
-
+function toNum(v) {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
 function getSvg(k) {
-  const n = svgTpl.querySelector('[data-k="' + k + '"]');
+  const n = svgTpl ? svgTpl.querySelector('[data-k="' + k + '"]') : null;
   return n ? n.cloneNode(true) : document.createTextNode("");
 }
-
 function isoDate(d) {
   const dt = d || new Date();
   return dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0");
 }
-
 function addDays(iso, n) {
-  const p = iso.split("-").map(Number);
+  const p = String(iso).split("-").map(Number);
   const dt = new Date(p[0], p[1] - 1, p[2]);
   dt.setDate(dt.getDate() + n);
   return isoDate(dt);
 }
-
 function deDate(iso) {
   if (!iso || String(iso).indexOf("-") < 0) return String(iso || "");
   const p = String(iso).split("-");
   if (p.length < 3) return String(iso);
   return p[2] + "." + p[1] + "." + p[0];
 }
-
 function defState() {
   return {
     version: 1, lastBackup: null, dailyWorkouts: {}, trainingLogs: [], bpLogs: [],
@@ -562,18 +613,17 @@ function defState() {
     mindDumpDraft: { q1: "", q2: "", q3: "" }, foodLogs: {}
   };
 }
-
 function normalizeState(p, fallbackLastBackup) {
   const d = defState();
   return {
     version: 1,
     lastBackup: p.lastBackup || fallbackLastBackup || null,
     dailyWorkouts: isPlainObj(p.dailyWorkouts) ? p.dailyWorkouts : d.dailyWorkouts,
-    trainingLogs: Array.isArray(p.trainingLogs) ? p.trainingLogs : d.trainingLogs,
-    bpLogs: Array.isArray(p.bpLogs) ? p.bpLogs : d.bpLogs,
+    trainingLogs: Array.isArray(p.trainingLogs) ? p.trainingLogs.filter(Boolean) : d.trainingLogs,
+    bpLogs: Array.isArray(p.bpLogs) ? p.bpLogs.filter(Boolean) : d.bpLogs,
     cognitionLogs: isPlainObj(p.cognitionLogs) ? p.cognitionLogs : d.cognitionLogs,
-    mindDumps: Array.isArray(p.mindDumps) ? p.mindDumps : d.mindDumps,
-    bodyLogs: Array.isArray(p.bodyLogs) ? p.bodyLogs : d.bodyLogs,
+    mindDumps: Array.isArray(p.mindDumps) ? p.mindDumps.filter(Boolean) : d.mindDumps,
+    bodyLogs: Array.isArray(p.bodyLogs) ? p.bodyLogs.filter(Boolean) : d.bodyLogs,
     customWeights: isPlainObj(p.customWeights) ? p.customWeights : d.customWeights,
     mindDumpDraft: isPlainObj(p.mindDumpDraft)
       ? { q1: p.mindDumpDraft.q1 || "", q2: p.mindDumpDraft.q2 || "", q3: p.mindDumpDraft.q3 || "" }
@@ -582,6 +632,7 @@ function normalizeState(p, fallbackLastBackup) {
   };
 }
 
+/* Zentrale Zustandsvariablen */
 let corruptStorageDetected = false;
 let state = (function() {
   const d = defState();
@@ -598,8 +649,19 @@ let state = (function() {
 })();
 
 let toastT = null;
+let actx = null, sndOn = true, wakeLock = null, keepAwake = false;
+let currentIsoDay = isoDate();
+let wMode = "kettlebell", tState = "idle", paused = false, pausedRemMs = 0, exIdx = 0, endTs = 0, durMs = 45000, tInt = null, lastBeep = -1;
+const openSet = new Set();
+let tPlan = "studio";
+let bpTime = new Date().getHours() < 14 ? "morning" : "evening";
+let focDate = isoDate(), focSavT = null;
+let brRun = false, brInt = null, brIdx = 0, brEnd = 0, brRnd = 0, brSnd = true;
+let fDate = isoDate(), calY = new Date().getFullYear(), calM = new Date().getMonth(), bMetric = "weight", foodSavT = null;
+
 function toast(msg) {
   const elNode = $("toast");
+  if (!elNode) return;
   elNode.textContent = msg;
   elNode.classList.add("show");
   clearTimeout(toastT);
@@ -633,13 +695,6 @@ function el(tag, attrs, children) {
   return node;
 }
 
-function copyText(text) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    return navigator.clipboard.writeText(text).then(() => true).catch(() => fallbackCopy(text));
-  }
-  return Promise.resolve(fallbackCopy(text));
-}
-
 function fallbackCopy(text) {
   try {
     const ta = document.createElement("textarea");
@@ -655,9 +710,14 @@ function fallbackCopy(text) {
   } catch (e) { return false; }
 }
 
-/* Audio & WakeLock */
-let actx = null, sndOn = true, wakeLock = null, keepAwake = false;
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).then(() => true).catch(() => fallbackCopy(text));
+  }
+  return Promise.resolve(fallbackCopy(text));
+}
 
+/* Audio & WakeLock */
 function unlockAudio() {
   try {
     if (!actx) {
@@ -692,9 +752,9 @@ function cue(type) {
   else if (type === "breath") { tone(432, 150); }
 }
 
-function setWakeUi(on) {
-  $("wakePill").textContent = on ? "Display: Wach" : "Display: Auto";
-  $("wakePill").classList.toggle("on", !!on);
+function setWakeUi(onState) {
+  $("wakePill").textContent = onState ? "Display: Wach" : "Display: Auto";
+  $("wakePill").classList.toggle("on", !!onState);
 }
 
 function isAnyTimerRunning() {
@@ -730,7 +790,6 @@ function maybeUnlockScreen() {
 }
 
 /* Tageswechsel bei geöffneter PWA */
-let currentIsoDay = isoDate();
 function handleDayRollover() {
   const nowIso = isoDate();
   if (nowIso === currentIsoDay) return;
@@ -783,11 +842,11 @@ document.querySelectorAll(".tab").forEach(b => {
 function updateDailyOverview() {
   const tod = isoDate();
   const fl = state.foodLogs[tod];
-  const hasBf = !!(fl && fl.breakfast && fl.breakfast.trim());
+  const hasBf = !!(fl && fl.breakfast && String(fl.breakfast).trim());
   const fChip = $("stFoodChip"), fTxt = $("stFoodTxt"), fBadge = $("stFoodBadge");
   fChip.classList.toggle("ok", hasBf);
   if (hasBf) {
-    const raw = fl.breakfast.trim();
+    const raw = String(fl.breakfast).trim();
     fTxt.textContent = raw.length > 22 ? raw.slice(0, 21) + "…" : raw;
     fBadge.textContent = "✓ Ja";
     fBadge.className = "badge b-grn";
@@ -818,7 +877,7 @@ function updateDailyOverview() {
   }
 }
 
-$("stFoodChip").addEventListener("click", () => {
+on("stFoodChip", "click", () => {
   const n = new Date();
   fDate = isoDate(n); calY = n.getFullYear(); calM = n.getMonth();
   switchTab("p-body");
@@ -826,7 +885,7 @@ $("stFoodChip").addEventListener("click", () => {
   setTimeout(() => { $("fdB").focus(); }, 60);
 });
 
-$("stFocChip").addEventListener("click", () => {
+on("stFocChip", "click", () => {
   focDate = isoDate();
   renderFocus();
   switchTab("p-focus");
@@ -853,9 +912,6 @@ const PLANS = {
     { t: "7. Bird-Dog (mit Kniepolster)", c: "Fokus: Kniepolster/Matte unterlegen! · 2 Sek. halten · Rumpf stabil", g: "Vierfüßlerstand auf einem Kniepolster oder einer Matte. Strecke diagonal Arm und Bein lang aus, halte die Position 2 Sekunden ruhig und kehre kontrolliert zurück.", s: "birddog" }
   ]
 };
-
-let wMode = "kettlebell", tState = "idle", paused = false, pausedRemMs = 0, exIdx = 0, endTs = 0, durMs = 45000, tInt = null, lastBeep = -1;
-const openSet = new Set();
 
 function displayExIdx() {
   if (tState === "rest") return Math.min(exIdx + 1, PLANS[wMode].length - 1);
@@ -988,7 +1044,7 @@ function tick() {
   if (sec <= 3 && sec >= 1 && sec !== lastBeep) { lastBeep = sec; cue("tick"); }
 }
 
-$("tStart").addEventListener("click", () => {
+on("tStart", "click", () => {
   unlockAudio();
   if (tState === "idle" || tState === "done") {
     if (tState === "done") exIdx = 0;
@@ -1018,7 +1074,7 @@ $("tStart").addEventListener("click", () => {
   }
 });
 
-$("tReset").addEventListener("click", () => {
+on("tReset", "click", () => {
   clearInterval(tInt); tInt = null; tState = "idle"; paused = false; pausedRemMs = 0; exIdx = 0;
   maybeUnlockScreen();
   $("tStage").className = "stage"; $("tPhase").textContent = "BEREIT · 7 ÜBUNGEN";
@@ -1026,7 +1082,7 @@ $("tReset").addEventListener("click", () => {
   renderActiveEx(); renderExList();
 });
 
-$("sndBtn").addEventListener("click", e => {
+on("sndBtn", "click", e => {
   unlockAudio();
   sndOn = !sndOn;
   e.target.textContent = sndOn ? "🔊 Ton an" : "🔇 Ton aus";
@@ -1064,7 +1120,6 @@ const TPLANS = {
     { id: "hm_triceps", t: "5. Trizeps-Drücken / French Press", w: "10 kg", r: "3×12-15", d: "Oberarme senkrecht fixieren, kontrolliert absenken und sauber strecken." }
   ]
 };
-let tPlan = "studio";
 
 function renderTrPlan() {
   const box = $("trCards");
@@ -1089,10 +1144,11 @@ function renderTrPlan() {
 }
 
 function renderTrHist() {
-  $("trCnt").textContent = String(state.trainingLogs.length);
+  const logs = (state.trainingLogs || []).filter(Boolean);
+  $("trCnt").textContent = String(logs.length);
   const box = $("trHist"); box.innerHTML = "";
-  if (!state.trainingLogs.length) { box.appendChild(el("p", { cls: "sub", txt: "Noch keine Trainingseinheiten gespeichert." })); return; }
-  const sorted = state.trainingLogs.slice().sort((a, b) =>
+  if (!logs.length) { box.appendChild(el("p", { cls: "sub", txt: "Noch keine Trainingseinheiten gespeichert." })); return; }
+  const sorted = logs.slice().sort((a, b) =>
     String(a.date || "").localeCompare(String(b.date || "")) || ((Number(a.id) || 0) - (Number(b.id) || 0))
   );
   sorted.slice(-8).reverse().forEach(l => {
@@ -1114,7 +1170,7 @@ document.querySelectorAll("[data-tp]").forEach(b => b.addEventListener("click", 
   renderTrPlan();
 }));
 
-$("trSave").addEventListener("click", () => {
+on("trSave", "click", () => {
   const done = [];
   TPLANS[tPlan].forEach(ex => {
     const chk = document.querySelector('[data-eid="' + ex.id + '"]');
@@ -1129,7 +1185,6 @@ $("trSave").addEventListener("click", () => {
 });
 
 /* TAB 3: BLUTDRUCK */
-let bpTime = new Date().getHours() < 14 ? "morning" : "evening";
 function syncBpTime() {
   $("bpMorn").classList.toggle("active", bpTime === "morning");
   $("bpEve").classList.toggle("active", bpTime === "evening");
@@ -1142,7 +1197,9 @@ function bpCat(s, d) {
 }
 
 function renderBp() {
-  const sorted = state.bpLogs.slice().sort((a, b) => {
+  const sorted = (state.bpLogs || []).filter(Boolean).map(x => Object.assign({}, x, {
+    sys: toNum(x.sys), dia: toNum(x.dia), pulse: toNum(x.pulse)
+  })).filter(x => x.sys !== null && x.dia !== null && x.pulse !== null).sort((a, b) => {
     const cmp = String(a.date || "").localeCompare(String(b.date || ""));
     if (cmp !== 0) return cmp;
     const ta = a.timeOfDay === "morning" ? 0 : 1;
@@ -1187,7 +1244,7 @@ function renderBp() {
     const del = el("button", { type: "button", cls: "btn btn-sm btn-red btn-del-row", txt: "×", "aria-label": "Blutdruck-Eintrag löschen" });
     del.addEventListener("click", () => {
       if (!confirm("Blutdruck-Messung vom " + deDate(it.date) + " (" + it.sys + "/" + it.dia + ") wirklich löschen?")) return;
-      state.bpLogs = state.bpLogs.filter(x => x.id !== it.id);
+      state.bpLogs = state.bpLogs.filter(x => x && x.id !== it.id);
       save(); renderBp(); toast("Gelöscht.");
     });
     tb.appendChild(el("tr", null, [
@@ -1203,9 +1260,9 @@ function renderBp() {
   $("bpHist").innerHTML = ""; $("bpHist").appendChild(tbl);
 }
 
-$("bpSave").addEventListener("click", () => {
-  const sys = Number($("bpSys").value), dia = Number($("bpDia").value), pulse = Number($("bpPul").value);
-  if (!Number.isFinite(sys) || !Number.isFinite(dia) || !Number.isFinite(pulse) || sys < 60 || sys > 260 || dia < 35 || dia > 160 || pulse < 30 || pulse > 230) {
+on("bpSave", "click", () => {
+  const sys = toNum($("bpSys").value), dia = toNum($("bpDia").value), pulse = toNum($("bpPul").value);
+  if (sys === null || dia === null || pulse === null || sys < 60 || sys > 260 || dia < 35 || dia > 160 || pulse < 30 || pulse > 230) {
     toast("Bitte plausible Werte eingeben."); return;
   }
   if (sys <= dia) { toast("Systole muss größer als Diastole sein."); return; }
@@ -1214,7 +1271,6 @@ $("bpSave").addEventListener("click", () => {
 });
 
 /* TAB 4: FOKUS */
-let focDate = isoDate(), focSavT = null;
 function peekCog(iso) {
   return state.cognitionLogs[iso] || { c1: false, c2: false, c3: false, note: "" };
 }
@@ -1246,8 +1302,8 @@ function renderFocus() {
   }
   updateDailyOverview();
 }
-[1, 2, 3].forEach(i => $("fChk" + i).addEventListener("change", e => { getCog(focDate)["c" + i] = e.target.checked; save(); renderFocus(); }));
-$("fNote").addEventListener("input", e => {
+[1, 2, 3].forEach(i => on("fChk" + i, "change", e => { getCog(focDate)["c" + i] = e.target.checked; save(); renderFocus(); }));
+on("fNote", "input", e => {
   getCog(focDate).note = e.target.value;
   if (save()) {
     $("fSav").textContent = "Gespeichert ✓";
@@ -1255,11 +1311,10 @@ $("fNote").addEventListener("input", e => {
     focSavT = setTimeout(() => { $("fSav").textContent = "Speichert automatisch"; }, 1100);
   }
 });
-$("focToday").addEventListener("click", () => { focDate = isoDate(); renderFocus(); });
+on("focToday", "click", () => { focDate = isoDate(); renderFocus(); });
 
 /* TAB 5: RUHE */
 const BR_PH = [{ l: "Einatmen", s: 1.55 }, { l: "Halten", s: 1.55 }, { l: "Ausatmen", s: 1.0 }, { l: "Halten", s: 1.0 }];
-let brRun = false, brInt = null, brIdx = 0, brEnd = 0, brRnd = 0, brSnd = true;
 function updBreath() {
   if (!brRun) { $("brCirc").style.transform = "scale(1)"; $("brPh").textContent = "Bereit"; $("brSec").textContent = "4s"; return; }
   const now = Date.now();
@@ -1277,7 +1332,7 @@ function updBreath() {
   const sc = brIdx === 0 ? 1 + 0.55 * pr : (brIdx === 2 ? 1.55 - 0.55 * pr : ph.s);
   $("brCirc").style.transform = "scale(" + sc.toFixed(3) + ")";
 }
-$("brStart").addEventListener("click", () => {
+on("brStart", "click", () => {
   unlockAudio();
   if (brRun) return;
   brRun = true; brIdx = 0; brEnd = Date.now() + 4000;
@@ -1286,22 +1341,23 @@ $("brStart").addEventListener("click", () => {
   clearInterval(brInt); brInt = setInterval(updBreath, 100);
   updBreath();
 });
-$("brStop").addEventListener("click", () => {
+on("brStop", "click", () => {
   brRun = false; clearInterval(brInt); brInt = null;
   maybeUnlockScreen();
   updBreath();
 });
-$("brSnd").addEventListener("click", e => {
+on("brSnd", "click", e => {
   unlockAudio();
   brSnd = !brSnd;
   e.target.textContent = brSnd ? "🔊 Ton an" : "🔇 Ton aus";
 });
 
 function renderDumps() {
+  const dumps = (state.mindDumps || []).filter(Boolean);
   const box = $("dHist"); box.innerHTML = "";
-  if (!state.mindDumps.length) return;
+  if (!dumps.length) return;
   box.appendChild(el("h4", { style: "font-size:13px;margin:0 0 8px;color:var(--mut)", txt: "Letzte Einträge" }));
-  state.mindDumps.slice(-5).reverse().forEach(d => {
+  dumps.slice(-5).reverse().forEach(d => {
     const it = el("div", { cls: "item" }, el("div", { style: "font-size:11.5px;font-weight:700;color:var(--blue);margin-bottom:4px", txt: deDate(d.date) }));
     if (d.q1) it.appendChild(el("div", { style: "font-size:12px", txt: "Belastend: " + d.q1 }));
     if (d.q2) it.appendChild(el("div", { style: "font-size:12px", txt: "Losgelassen: " + d.q2 }));
@@ -1310,10 +1366,13 @@ function renderDumps() {
   });
 }
 [1, 2, 3].forEach(i => {
-  $("dq" + i).value = state.mindDumpDraft["q" + i] || "";
-  $("dq" + i).addEventListener("input", e => { state.mindDumpDraft["q" + i] = e.target.value; save(); });
+  const elQ = $("dq" + i);
+  if (elQ) {
+    elQ.value = state.mindDumpDraft["q" + i] || "";
+    elQ.addEventListener("input", e => { state.mindDumpDraft["q" + i] = e.target.value; save(); });
+  }
 });
-$("dSave").addEventListener("click", () => {
+on("dSave", "click", () => {
   const q1 = $("dq1").value.trim(), q2 = $("dq2").value.trim(), q3 = $("dq3").value.trim();
   if (!q1 && !q2 && !q3) { toast("Bitte mindestens ein Feld ausfüllen."); return; }
   state.mindDumps.push({ id: Date.now(), date: isoDate(), q1, q2, q3 });
@@ -1323,8 +1382,6 @@ $("dSave").addEventListener("click", () => {
 });
 
 /* TAB 6: KÖRPER & ESSEN + MEAL-PREP REZEPTE */
-let fDate = isoDate(), calY = new Date().getFullYear(), calM = new Date().getMonth(), bMetric = "weight", foodSavT = null;
-
 const RECIPES = [
   {
     id: "apfel_oats",
@@ -1444,9 +1501,7 @@ function populateMealDropdowns() {
   document.querySelectorAll("[data-prep-meal]").forEach(sel => {
     sel.innerHTML = "";
     sel.appendChild(el("option", { value: "", txt: "+ Meal-Prep / Shake wählen…" }));
-    RECIPES.forEach(r => {
-      sel.appendChild(el("option", { value: r.id, txt: r.label }));
-    });
+    RECIPES.forEach(r => sel.appendChild(el("option", { value: r.id, txt: r.label })));
   });
 }
 
@@ -1464,10 +1519,7 @@ document.querySelectorAll("[data-prep-meal]").forEach(sel => {
 function clearMealField(mealKey) {
   const l = getFood(fDate);
   l[mealKey] = "";
-  save();
-  flashFood();
-  renderFoodDay();
-  renderCal();
+  save(); flashFood(); renderFoodDay(); renderCal();
   toast("Eintrag gelöscht.");
 }
 
@@ -1475,13 +1527,10 @@ document.querySelectorAll("[data-del-meal]").forEach(btn => {
   btn.addEventListener("click", () => clearMealField(btn.getAttribute("data-del-meal")));
 });
 
-$("clearDayMeals").addEventListener("click", () => {
+on("clearDayMeals", "click", () => {
   if (!confirm("Alle Mahlzeiten und Haken für " + deDate(fDate) + " wirklich löschen?")) return;
   delete state.foodLogs[fDate];
-  save();
-  flashFood();
-  renderFoodDay();
-  renderCal();
+  save(); flashFood(); renderFoodDay(); renderCal();
   toast("Alle Mahlzeiten für " + deDate(fDate) + " geleert.");
 });
 
@@ -1574,7 +1623,7 @@ function foodStat(iso) {
   const l = state.foodLogs[iso];
   if (!l) return "";
   if (l.replacedMeal && l.noSnacking) return "grn";
-  if ((l.breakfast && l.breakfast.trim()) || (l.lunch && l.lunch.trim()) || (l.dinner && l.dinner.trim()) || (l.snacks && l.snacks.trim()) || l.replacedMeal || l.noSnacking) return "amb";
+  if ((l.breakfast && String(l.breakfast).trim()) || (l.lunch && String(l.lunch).trim()) || (l.dinner && String(l.dinner).trim()) || (l.snacks && String(l.snacks).trim()) || l.replacedMeal || l.noSnacking) return "amb";
   return "";
 }
 function renderCal() {
@@ -1606,14 +1655,14 @@ function flashFood() {
   foodSavT = setTimeout(() => { $("foodSav").textContent = "Speichert automatisch"; }, 1000);
 }
 
-$("calPrev").addEventListener("click", () => { calM--; if (calM < 0) { calM = 11; calY--; } renderCal(); });
-$("calNext").addEventListener("click", () => { calM++; if (calM > 11) { calM = 0; calY++; } renderCal(); });
-$("calToday").addEventListener("click", () => { const n = new Date(); fDate = isoDate(n); calY = n.getFullYear(); calM = n.getMonth(); renderCal(); renderFoodDay(); });
-$("calTmrw").addEventListener("click", () => { const t = addDays(isoDate(), 1), p = t.split("-").map(Number); fDate = t; calY = p[0]; calM = p[1] - 1; renderCal(); renderFoodDay(); });
-$("fdRep").addEventListener("change", e => { getFood(fDate).replacedMeal = e.target.checked; if (save()) flashFood(); renderFoodDay(); renderCal(); });
-$("fdSnk").addEventListener("change", e => { getFood(fDate).noSnacking = e.target.checked; if (save()) flashFood(); renderFoodDay(); renderCal(); });
+on("calPrev", "click", () => { calM--; if (calM < 0) { calM = 11; calY--; } renderCal(); });
+on("calNext", "click", () => { calM++; if (calM > 11) { calM = 0; calY++; } renderCal(); });
+on("calToday", "click", () => { const n = new Date(); fDate = isoDate(n); calY = n.getFullYear(); calM = n.getMonth(); renderCal(); renderFoodDay(); });
+on("calTmrw", "click", () => { const t = addDays(isoDate(), 1), p = t.split("-").map(Number); fDate = t; calY = p[0]; calM = p[1] - 1; renderCal(); renderFoodDay(); });
+on("fdRep", "change", e => { getFood(fDate).replacedMeal = e.target.checked; if (save()) flashFood(); renderFoodDay(); renderCal(); });
+on("fdSnk", "change", e => { getFood(fDate).noSnacking = e.target.checked; if (save()) flashFood(); renderFoodDay(); renderCal(); });
 [["fdB", "breakfast"], ["fdL", "lunch"], ["fdD", "dinner"], ["fdS", "snacks"]].forEach(p => {
-  $(p[0]).addEventListener("input", e => { getFood(fDate)[p[1]] = e.target.value; if (save()) flashFood(); renderCal(); updateDailyOverview(); });
+  on(p[0], "input", e => { getFood(fDate)[p[1]] = e.target.value; if (save()) flashFood(); renderCal(); updateDailyOverview(); });
 });
 
 document.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", () => {
@@ -1623,10 +1672,12 @@ document.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", 
 }));
 
 function renderBody() {
-  const sorted = state.bodyLogs.slice().sort((a, b) =>
+  const sorted = (state.bodyLogs || []).filter(Boolean).map(x => Object.assign({}, x, {
+    weight: toNum(x.weight), muscle: toNum(x.muscle), water: toNum(x.water), fat: toNum(x.fat)
+  })).sort((a, b) =>
     String(a.date || "").localeCompare(String(b.date || "")) || ((Number(a.id) || 0) - (Number(b.id) || 0))
   );
-  const pts = sorted.filter(x => typeof x[bMetric] === "number" && !isNaN(x[bMetric]));
+  const pts = sorted.filter(x => x[bMetric] !== null);
   const cols = { weight: "#38bdf8", muscle: "#10b981", water: "#a78bfa", fat: "#f59e0b" };
   if (!pts.length) {
     $("bdChart").innerHTML = '<div style="text-align:center;padding:20px;color:var(--mut);font-size:12px">Noch keine Daten vorhanden.</div>';
@@ -1647,7 +1698,7 @@ function renderBody() {
   let prevWeight = null;
   const rows = sorted.map(it => {
     let dw = null;
-    if (typeof it.weight === "number" && !isNaN(it.weight)) {
+    if (it.weight !== null) {
       if (prevWeight !== null) dw = it.weight - prevWeight;
       prevWeight = it.weight;
     }
@@ -1658,36 +1709,35 @@ function renderBody() {
   const tb = el("tbody");
   rows.forEach(r => {
     const dCell = el("td");
-    if (r.dw !== null && !isNaN(r.dw)) dCell.appendChild(el("span", { cls: r.dw > 0 ? "pos" : (r.dw < 0 ? "neg" : ""), txt: (r.dw > 0 ? "+" : "") + r.dw.toFixed(1) }));
+    if (r.dw !== null && Number.isFinite(r.dw)) dCell.appendChild(el("span", { cls: r.dw > 0 ? "pos" : (r.dw < 0 ? "neg" : ""), txt: (r.dw > 0 ? "+" : "") + r.dw.toFixed(1) }));
     else dCell.textContent = "—";
     const del = el("button", { type: "button", cls: "btn btn-sm btn-red btn-del-row", txt: "×", "aria-label": "Körper-Messwert löschen" });
     del.addEventListener("click", () => {
       if (!confirm("Körper-Messwert vom " + deDate(r.date) + " wirklich löschen?")) return;
-      state.bodyLogs = state.bodyLogs.filter(x => x.id !== r.id);
+      state.bodyLogs = state.bodyLogs.filter(x => x && x.id !== r.id);
       save(); renderBody(); toast("Messwert gelöscht.");
     });
     tb.appendChild(el("tr", null, [
       el("td", { txt: deDate(r.date) }),
-      el("td", null, el("strong", { txt: r.weight != null ? r.weight.toFixed(1) : "—" })),
+      el("td", null, el("strong", { txt: r.weight !== null ? r.weight.toFixed(1) : "—" })),
       dCell,
-      el("td", { txt: r.muscle != null ? r.muscle.toFixed(1) : "—" }),
-      el("td", { txt: r.water != null ? r.water.toFixed(1) : "—" }),
-      el("td", { txt: r.fat != null ? r.fat.toFixed(1) : "—" }),
+      el("td", { txt: r.muscle !== null ? r.muscle.toFixed(1) : "—" }),
+      el("td", { txt: r.water !== null ? r.water.toFixed(1) : "—" }),
+      el("td", { txt: r.fat !== null ? r.fat.toFixed(1) : "—" }),
       el("td", { style: "text-align:right" }, del)
     ]));
   });
   tbl.appendChild(tb); box.appendChild(tbl);
 }
 
-$("bdSave").addEventListener("click", () => {
-  const num = id => { const v = $(id).value.trim(); if (v === "") return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
-  const weight = num("bdW"), muscle = num("bdM"), water = num("bdWa"), fat = num("bdF");
+on("bdSave", "click", () => {
+  const weight = toNum($("bdW").value), muscle = toNum($("bdM").value), water = toNum($("bdWa").value), fat = toNum($("bdF").value);
   if (weight === null && muscle === null && water === null && fat === null) { toast("Bitte mindestens einen Messwert eingeben."); return; }
   state.bodyLogs.push({ id: Date.now(), date: $("bdDate").value || isoDate(), weight, muscle, water, fat, notes: $("bdN").value.trim() });
   if (save()) { ["bdW", "bdM", "bdWa", "bdF", "bdN"].forEach(id => { $(id).value = ""; }); renderBody(); toast("Körperwerte gespeichert!"); }
 });
 
-/* TAB 7: BACKUP */
+/* TAB 7: BACKUP & UPDATE */
 function renderBackup() {
   const raw = localStorage.getItem(KEY) || "";
   const dCnt = Object.keys(state.dailyWorkouts || {}).length;
@@ -1697,7 +1747,7 @@ function renderBackup() {
   const boCnt = (state.bodyLogs || []).length;
   const cogCnt = Object.keys(state.cognitionLogs || {}).filter(k => {
     const c = state.cognitionLogs[k];
-    return c && (c.c1 || c.c2 || c.c3 || (c.note && c.note.trim()));
+    return c && (c.c1 || c.c2 || c.c3 || (c.note && String(c.note).trim()));
   }).length;
   const foCnt = cogCnt + (state.mindDumps || []).length;
   const totalItems = dCnt + tCnt + bCnt + fCnt + boCnt + foCnt;
@@ -1728,7 +1778,7 @@ function renderBackup() {
   }
 }
 
-$("expBtn").addEventListener("click", () => {
+on("expBtn", "click", () => {
   state.lastBackup = new Date().toISOString(); save(); renderBackup();
   const url = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], { type: "application/json" }));
   const a = el("a", { href: url, download: "health-life-backup-" + isoDate() + ".json" });
@@ -1737,7 +1787,7 @@ $("expBtn").addEventListener("click", () => {
   toast("JSON-Backup heruntergeladen.");
 });
 
-$("impInp").addEventListener("change", e => {
+on("impInp", "change", e => {
   const file = e.target.files && e.target.files[0]; if (!file) return;
   const rd = new FileReader();
   rd.onload = ev => {
@@ -1746,7 +1796,7 @@ $("impInp").addEventListener("change", e => {
       if (!isPlainObj(p)) throw new Error("Kein Objekt");
       const knownKeys = ["dailyWorkouts", "trainingLogs", "bpLogs", "cognitionLogs", "mindDumps", "bodyLogs", "customWeights", "mindDumpDraft", "foodLogs"];
       if (!knownKeys.some(k => Object.prototype.hasOwnProperty.call(p, k))) {
-        throw new Error("Keine gültige Health-&-Life-Sicherungsdatei");
+        throw new Error("Keine gültige Sicherungsdatei");
       }
       if (!confirm("Achtung: Alle aktuell gespeicherten Daten werden durch das Backup ersetzt. Fortfahren?")) return;
       state = normalizeState(p, new Date().toISOString());
@@ -1760,90 +1810,66 @@ $("impInp").addEventListener("change", e => {
   rd.readAsText(file);
 });
 
+on("updBtn", "click", async () => {
+  const btn = $("updBtn");
+  if (!navigator.onLine) {
+    toast("Offline: Bitte erst mit dem Internet verbinden.");
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = "⏳ Prüfe auf Updates...";
+  try {
+    const probe = await fetch("./index.html?nocache=" + Date.now(), { cache: "no-store" });
+    if (!probe.ok) throw new Error("Server nicht erreichbar");
+
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+    if ("serviceWorker" in navigator) {
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg) await reg.update().catch(() => {});
+    }
+
+    toast("Update geladen – App startet neu...");
+    setTimeout(() => window.location.reload(), 450);
+  } catch (err) {
+    toast("Kein Server-Kontakt – Offline-Cache bleibt erhalten.");
+    btn.disabled = false;
+    btn.textContent = "🔄 Auf App-Update prüfen & neu laden";
+  }
+});
+
 /* INIT */
+function safeRun(fn) {
+  try { fn(); } catch (e) { console.error(e); }
+}
+
 function initAll() {
   const tod = isoDate();
   currentIsoDay = tod;
   $("datePill").textContent = deDate(tod);
   $("trDate").value = tod; $("bpDate").value = tod; $("bdDate").value = tod;
-  updateDailyStat(); updateDailyOverview(); renderActiveEx(); renderExList();
-  renderTrPlan(); renderTrHist();
-  syncBpTime(); renderBp();
-  focDate = tod; renderFocus();
-  renderDumps();
+  focDate = tod;
   fDate = tod; calY = new Date().getFullYear(); calM = new Date().getMonth();
-  populateMealDropdowns(); renderRecipes(); renderCal(); renderFoodDay(); renderBody();
-  renderBackup();
+  [
+    updateDailyStat, updateDailyOverview, renderActiveEx, renderExList,
+    renderTrPlan, renderTrHist, syncBpTime, renderBp, renderFocus,
+    renderDumps, populateMealDropdowns, renderRecipes, renderCal,
+    renderFoodDay, renderBody, renderBackup
+  ].forEach(safeRun);
   if (corruptStorageDetected) {
     corruptStorageDetected = false;
     toast("Warnung: Lokale Daten waren beschädigt – bitte JSON-Backup importieren!");
   }
 }
 initAll();
-})();
-</script>
 
-<!-- DISCLAIMER MODAL (bei jedem Start) -->
-<div id="discModal" class="modal-backdrop open" role="dialog" aria-modal="true" aria-labelledby="discTitle">
-  <div class="modal-box" style="border-color:rgba(245,158,11,.55)">
-    <div class="modal-hdr">
-      <h2 id="discTitle" style="color:#fbbf24">⚠️ Wichtiger Hinweis & Haftungsausschluss</h2>
-    </div>
-    <div class="modal-body">
-      <p><strong>Training auf eigene Gefahr:</strong> Alle Übungen, Timings und Trainingspläne in dieser App erfolgen vollständig auf eigene Verantwortung und Gefahr.</p>
-      <p><strong>Keine Gesundheitsberatung:</strong> Diese Anwendung dient ausschließlich der persönlichen Dokumentation und Selbstorganisation. Sie stellt <strong>keine medizinische, ärztliche, physiotherapeutische oder ernährungswissenschaftliche Beratung</strong> dar und ersetzt keine Untersuchung durch Fachpersonal.</p>
-      <p style="font-size:12px;color:var(--mut)">Bei Schmerzen, Schwindel, Vorerkrankungen oder auffälligen Blutdruckwerten brich das Training sofort ab und konsultiere einen Arzt.</p>
-      <button type="button" id="discAccept" class="btn btn-grn full" style="margin-top:6px">✓ Verstanden & auf eigene Gefahr starten</button>
-    </div>
-  </div>
-</div>
-
-<!-- ÜBER DIE APP MODAL -->
-<div id="aboutModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <h2 id="aboutTitle">ℹ️ Über Health & Life Dashboard</h2>
-      <button type="button" id="aboutCloseX" class="btn btn-sm" aria-label="Schließen">✕</button>
-    </div>
-    <div class="modal-body">
-      <p><strong>100 % Offline & ohne Cloud:</strong> Ziel dieser App war es, einen übersichtlichen Gesundheits-, Trainings- und Alltagstracker zu schaffen, der komplett ohne Benutzerkonto, Cloud-Zwang oder Datenweitergabe auskommt. Alle Einträge bleiben lokal in deinem Browser (mit JSON-Backup).</p>
-      <p><strong>Gelenkschonender Ansatz:</strong> Die hinterlegten Übungen und Routinen basieren auf gelenkschonenden Bewegungsabläufen (z. B. kontrollierte Hüft- und Rumpfstabilität, moderate Winkel, Polsterung).</p>
-      <p><strong>Mit KI entwickelt – frei anpassbar (MIT-Lizenz):</strong> Diese Single-File-HTML-App wurde mithilfe von Künstlicher Intelligenz erstellt. Der Quellcode ist bewusst schlank und offen gehalten, damit ihn jeder frei nutzen, mit einer eigenen KI weiterentwickeln oder mit HTML/JS-Kenntnissen an seine eigenen Bedürfnisse anpassen kann.</p>
-      <p style="font-size:12px;color:var(--mut)">Hinweis: Kein Medizinprodukt · Nutzung und Training auf eigene Gefahr.</p>
-      <button type="button" id="aboutCloseBtn" class="btn btn-blue full" style="margin-top:4px">Schließen</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  const discModal = document.getElementById("discModal");
-  const aboutModal = document.getElementById("aboutModal");
-  document.getElementById("discAccept").addEventListener("click", () => {
-    discModal.classList.remove("open");
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
   });
-  document.getElementById("aboutBtn").addEventListener("click", () => {
-    aboutModal.classList.add("open");
-  });
-  document.getElementById("aboutCloseX").addEventListener("click", () => {
-    aboutModal.classList.remove("open");
-  });
-  document.getElementById("aboutCloseBtn").addEventListener("click", () => {
-    aboutModal.classList.remove("open");
-  });
-  aboutModal.addEventListener("click", e => {
-    if (e.target === aboutModal) aboutModal.classList.remove("open");
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && aboutModal.classList.contains("open")) {
-      aboutModal.classList.remove("open");
-    }
-  });
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
-    });
-  }
+}
 })();
 </script>
 </body>
